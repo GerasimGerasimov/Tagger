@@ -1,4 +1,5 @@
 {
+    "name":"node2",
     "HOST":{
         "url": "localhost",
         "port": 5000

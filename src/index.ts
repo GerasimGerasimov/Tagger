@@ -1,24 +1,23 @@
 import fs = require('fs');
+import * as utils from './utils'
 //читаю содержимое папки configuration
 const ConfDirName:string = './configuration';
-
-function getDirList(path: string): Array<string> {
-    return fs.readdirSync(path,"utf8");
-}
-
-let DirList =  getDirList(ConfDirName);
-//получаю список директорий - нод,
-console.log('getDevsFiles.DirList:',DirList);
-//теперь надо пройтись по списку и прочитать ноды
-let res = [];
-let i = DirList.length;
-while (i-- !=0) {
-    let o = {};// res[DirList[i]] = {};
-    o.name = DirList[i];
-    o.path = ConfDirName+"/"+DirList[i]+'/';
-    o.files = fs.readdirSync(o.path,"utf8");
-    res.push(o);
-}
-
+const NodesDir: string = `${ConfDirName}/nodes`;
+const DevicesDir: string = `${ConfDirName}/devices`;
+//получаю список директорий в директории configuration
+//должны присутсвовать nodes и devices - иначе на выход
+//проверка существования директорий
+utils.validateFolderExistence(DevicesDir);
+utils.validateFolderExistence(NodesDir);
+//загружаю списки файлов в директориях
+let NodesDirList: Array<string> =  utils.getFilesList(NodesDir);
+let DevicesFilesList: Array<string> =  utils.getFilesList(DevicesDir);
+//загружаю содержимое файлов, и их свойства
+const NodesFilesProps:Array<utils.IDirСontents> =  utils.getFilesProps(NodesDir, NodesDirList);
+const DevicesFilesProps:Array<utils.IDirСontents> =  utils.getFilesProps(DevicesDir, DevicesFilesList);
+/*
+const DirsContent:Array<utils.IDirСontents> =  utils.getDirsContent(ConfDirName, DirList);
+console.log(DirsContent);
 const settings = JSON.parse(fs.readFileSync('./configuration/node1/config.json', 'utf8'));
 console.log(settings);
+*/
