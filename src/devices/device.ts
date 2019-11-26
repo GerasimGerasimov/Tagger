@@ -32,7 +32,7 @@ export interface IDevice {
 export function getDeviceFromFile(content: any): IDevice {
   content = ini.loadLinesFromBuffer(content);
   console.log(content);
-  const vars = ini.getSectionListFromBuffer('vars', content);
-  console.log(vars);
+  const varsList: Array<string> = ini.getSectionListFromBuffer('vars', content);
+  console.log(varsList);
   return;
 }
