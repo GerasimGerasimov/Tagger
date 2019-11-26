@@ -14,8 +14,12 @@ export class TVars {
 
     }
 
-    public getVar(name:string): number {
+    private getVarValue(nameWithOption: string): number {
+        return 1.0;
+    }
 
-        return 1;//значение по умолчанию
+    public getVar(name:string): number {
+        const f: number = parseFloat(name.replace(",","."));//замена "," на "." если есть
+        return (!isNaN(f))? f : this.getVarValue(name);
     }
 }
