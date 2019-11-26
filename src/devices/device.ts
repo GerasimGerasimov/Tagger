@@ -1,4 +1,5 @@
-import * as ini from '../inifile/inifile'
+import * as ini from '../inifile/inifile';
+import { TVars } from './TVars'
 //ini превращаю в теги типа
 /*{ name: vteg_v1.15,
     RAM:{Iexc:{параметры}, , , , },
@@ -34,5 +35,12 @@ export function getDeviceFromFile(content: any): IDevice {
   console.log(content);
   const varsList: Array<string> = ini.getSectionListFromBuffer('vars', content);
   console.log(varsList);
+  const vars:TVars = new TVars(varsList);
+  console.log(vars.getScale('0,156'));
+  console.log(vars.getScale('IsScale'));
+  console.log(vars.getScale('IsScale*1,8'));
+  console.log(vars.getScale('IrScale'));
+  console.log(vars.getScale('IrScale%1,8'));
+  console.log(vars.getScale('IrScale*1,8'));
   return;
 }
