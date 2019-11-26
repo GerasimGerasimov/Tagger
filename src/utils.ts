@@ -9,9 +9,9 @@ export function getFilesList(path: string): Array<string> {
 }
 
 export interface IDirСontents {
-    FileName: string;
-    Path: string;
-    Content: any;
+    FileName: string; // file name
+    Path: string;     // relative path to file and file name ./dir/subdir/file.name
+    Content: any;     // file's content
 }
 
 export function getFilesProps(root: string, FolderContentList: Array<string>):Array<IDirСontents> {

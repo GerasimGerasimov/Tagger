@@ -17,7 +17,7 @@
     "fieldbus":"ModbusRTU",
     "Devices":[
         {
-            "source":"vteg_v1.15.ini",
+            "source":"sbfcb8.ini",
             "addr":[
                 {"U1":1},
                 {"U2":1}
