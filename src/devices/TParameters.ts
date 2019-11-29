@@ -2,6 +2,7 @@
 import { TVars } from './TVars'; // шкалы
 import { TSignal } from './TSignal';
 import { TBit } from './TBit';
+import { TU16 } from './TU16';
  
 export class TParameters {
     private vars:TVars;
@@ -23,7 +24,8 @@ export class TParameters {
     private factory (ini: string): TSignal {
         const ObjType = this.getObjTypeFromIni(ini);
         const ObjTypes = {
-            'TBit' : () => {return new TBit(ini, this.vars)},
+            'TBit'  : () => {return new TBit(ini, this.vars)},
+            'TWORD' : () => {return new TU16(ini, this.vars)},
             'default': () => {
                 console.log(`${ObjType} not found`)
                 return undefined;
@@ -35,7 +37,7 @@ export class TParameters {
     private parseListToMap(ParametersList: Array<string>) {
         ParametersList.forEach((item: string) => { 
             if (item[0] !== ';') {//если не комментарий
-                console.log(item);
+                //console.log(item);
                 let signal = this.factory(item);// получаю объект параметра
                 if (signal !== undefined) {//и если он создался
                     let key: string = signal.name;//до добавляю в карту

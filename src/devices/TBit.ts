@@ -5,6 +5,7 @@ import { TSignal } from './TSignal';
 //  BIT=name/comments/objecttype/addr/mask/mbreg/options/bytesize/base/
 export class TBit extends TSignal {
     private mask: number = 0;//маска расположения бита в регистре
+    
     constructor(ini: string, vars:TVars) {
         super(ini, vars);
         //this.mask = Number(this.ini[4]);

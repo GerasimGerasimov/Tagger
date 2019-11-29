@@ -29,9 +29,9 @@ export class TSignal {
     public rawData: number = 0;//данные объекта
     public option: any = 0;//опции параметра (напр, для TFloat)
     public regNum: number = 0;//номер начального регистра rXXXX
-    public regOffs: boolean = false; // true  - rXXXX.H - старший байт для TByte параметров 
+    //public regOffs: boolean = false; // true  - rXXXX.H - старший байт для TByte параметров 
                                     // false - rXXXX.L - младший байт
-    public regBitNum: number = 1;//номер бита для TBit-параметров
+    //public regBitNum: number = 1;//номер бита для TBit-параметров
     
     public ini: Array<string>;
 
