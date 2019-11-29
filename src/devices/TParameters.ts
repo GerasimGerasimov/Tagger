@@ -3,6 +3,8 @@ import { TVars } from './TVars'; // шкалы
 import { TSignal } from './TSignal';
 import { TBit } from './TBit';
 import { TU16 } from './TU16';
+import { TU8 } from './TU8';
+import { TS16 } from './TS16';
  
 export class TParameters {
     private vars:TVars;
@@ -26,6 +28,8 @@ export class TParameters {
         const ObjTypes = {
             'TBit'  : () => {return new TBit(ini, this.vars)},
             'TWORD' : () => {return new TU16(ini, this.vars)},
+            'TByte' : () => {return new TU8(ini, this.vars)},
+            'TInteger' : () => {return new TS16(ini, this.vars)},
             'default': () => {
                 console.log(`${ObjType} not found`)
                 return undefined;

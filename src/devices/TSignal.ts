@@ -20,7 +20,7 @@ export class TSignal {
     public bytes: number = 2;//кол-во байт занимаемых Параметром
     public depend: string = '';//имя параметра от которого зависит это параметр
     public IC: number = 1.0;//коэффициент зависимости от Мастера
-    public base: string = '0';//уставка
+    public base: number = 0.0;//уставка
     public scale: number =1.0;//коэффициент для перевода из hex в физическую величину
     public isMaster: boolean = false;//true - Мастер-параметр, от него зависят другие параметры
     public notAddressable: boolean = false;//true - параметр требуется для расчётов и не входит в адресное пространство устройства
@@ -29,9 +29,6 @@ export class TSignal {
     public rawData: number = 0;//данные объекта
     public option: any = 0;//опции параметра (напр, для TFloat)
     public regNum: number = 0;//номер начального регистра rXXXX
-    //public regOffs: boolean = false; // true  - rXXXX.H - старший байт для TByte параметров 
-                                    // false - rXXXX.L - младший байт
-    //public regBitNum: number = 1;//номер бита для TBit-параметров
     
     public ini: Array<string>;
 
