@@ -1,6 +1,11 @@
+//Контейнер для Коэффициентов преобразования в физические значения
+//для современных проектов это может быть и рудиментом, так как
+//расчёты идут в контроллере, но... где-то может и сгодится
 //тут парсится массив строк из секции [vars] в объект шкал
 //а так же отдаёт значения заданной шкалы по требованию
 //IsScale%1,8
+import { StrToFloat} from '../utils/miscel'
+
 interface IScaleOptions {
     ScaleName:  string; // IsScale
     MathOpCode: string; // %
@@ -25,6 +30,7 @@ export class TVars {
     }
 
     public getScale(name: string): number {
+        if ((name === "") || (name === undefined)) return 1.0;
         const f: number = parseFloat(name.replace(",", ".")); //замена "," на "." если есть
         return (!isNaN(f)) ? f : this.getScaleValue(name);
     }
@@ -44,11 +50,12 @@ export class TVars {
                 if (b[0] === key) {
                     //в последнем элементе находится шкала
                     //почему в последнем? потому что в среднем
-                    //может находится а может не находится комментарий                    
-                    const f: number = parseFloat(b[b.length-1].replace(",","."));
-                    return (!isNaN(f))
-                        ? f
-                        : 1.0; //значение по умолчанию, если не преобразовался в число
+                    //может находится а может не находится комментарий 
+                    return StrToFloat(b[b.length-1], 1.0);                   
+                    //const f: number = parseFloat(b[b.length-1].replace(",","."));
+                    //return (!isNaN(f))
+                    //    ? f
+                    //    : 1.0; //значение по умолчанию, если не преобразовался в число
                 }
             }
         }

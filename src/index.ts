@@ -1,5 +1,5 @@
 import fs = require('fs');
-import * as utils from './utils';
+import * as utils from './utils/utils';
 import * as device from './devices/device'
 //читаю содержимое папки configuration
 const ConfDirName:string = './configuration';
