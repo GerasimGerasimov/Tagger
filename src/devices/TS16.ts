@@ -31,6 +31,7 @@ export class TS16 extends TSignal {
                 this.IC      = StrToFloat(this.ini[10]);
             }
         }
+        
         this.base    = parseInt(this.ini[this.ini.length - 1].slice(1,5), 16);//уставка - это последнее значение
         //получить значение шкалы
         this.scale = vars.getScale(this.scaleStr);

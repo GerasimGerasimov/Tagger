@@ -29,7 +29,7 @@ export class TU16 extends TSignal {
                 this.IC      = StrToFloat(this.ini[9]);
             }
         }
-        this.base    = this.ini[this.ini.length - 1];//уставка - это последнее значение
+        this.base = parseInt(this.ini[this.ini.length - 1].slice(1,5), 16);//уставка - это последнее значение
         //получить значение шкалы
         this.scale = vars.getScale(this.scaleStr);
     }

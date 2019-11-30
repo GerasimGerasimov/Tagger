@@ -12,7 +12,7 @@ export class TBit extends TSignal {
         this.regStr = this.ini[5];
         this.option = this.ini[6];
         this.bytes  = 2;//Number(this.ini[6]); всегда читает 16 бит регистр
-        this.base   = this.ini[this.ini.length - 1];//уставка - это последнее значение
+        this.base   = parseInt(this.ini[this.ini.length - 1]);//уставка - это последнее значение
         //обработка rRRRR.M
         const reg = this.regStr.split(/[r.]/).splice(1);
         this.regNum =  parseInt(reg[0],16);

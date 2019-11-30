@@ -51,8 +51,20 @@ export function getDeviceFromFile(content: any): IDevice {
   //поэтому секции с уставками можно рассматривать как наиболее полно описывающие
   //параметры вообще
   //получаю содержимое секции [FLASH]
-  const FlashList: Array<string> = ini.getSectionListFromBuffer('FLASH', content);   
+  const FlashList: Array<string> = ini.getSectionListFromBuffer('FLASH', content);
+  //распарсиваю ini-строки определяю тип объекта - это Модель-объекта   
   const flash:TParameters = new TParameters(vars, FlashList);
-  console.log(flash);
+  //получаю содержимое секции [RAM]
+  const RAMList: Array<string> = ini.getSectionListFromBuffer('RAM', content);
+  //распарсиваю ini-строки определяю тип объекта - это Модель-объекта   
+  const ram:TParameters = new TParameters(vars, RAMList);
+  //получаю содержимое секции [CD]
+  const CDList: Array<string> = ini.getSectionListFromBuffer('CD', content);
+  //распарсиваю ini-строки определяю тип объекта - это Модель-объекта   
+  const cd:TParameters = new TParameters(vars, CDList);
+  //теперь надо переварить модели в контроллеры, а именно
+  //есть слоты, есть параметры которые надо разместить в слотах
+  //надо запустить порты, запустить линк-менеджеры, заполнить слоты,
+  //организовать считывание данных
   return;
 }
