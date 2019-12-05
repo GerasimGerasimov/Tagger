@@ -25,27 +25,32 @@ interface IScale {
 export interface IDevice {
     name: string;//название устройства (имя файла ini)
     ID: string;//строка идентификации
-    RAM:   {Object<IParameter>()};
-    FLASH: {Object<IParameter>()};
-    CD:    {Object<IParameter>()};
-    vars:  {Object<IScale>()};
+    ram:   TParameters;
+    flash: TParameters;
+    cd:    TParameters;
+    vars:  TVars;
 }
 
-export function getDeviceFromFile(content: any): IDevice {
+export function getDeviceFromFile(name: string, content: any): IDevice {
   content = ini.loadLinesFromBuffer(content);
   console.log(content);
+  //ID
+  const IDList: Array<string> = ini.getSectionListFromBuffer('DEVICE', content);
+  const ID:string = ini.getValueByKeyFromList('ID', IDList, '');
   //получаю содержимое секции [vars]
   const varsList: Array<string> = ini.getSectionListFromBuffer('vars', content);
   console.log(varsList);
   //преобразую [vars] в объект
   //для быстрого доступа к шкалам и вычислению их значений
   const vars:TVars = new TVars(varsList);
+  /*
   console.log(vars.getScale('0,156'));
   console.log(vars.getScale('IsScale'));
   console.log(vars.getScale('IsScale*1,8'));
   console.log(vars.getScale('IrScale'));
   console.log(vars.getScale('IrScale%1,8'));
   console.log(vars.getScale('IrScale*1,8'));
+  */
   //теперь гружу секцию [FLASH] - параметры в ней, как ы CD имеют
   //опциональную часть в которой содержится уставка, в RAM такого нет
   //поэтому секции с уставками можно рассматривать как наиболее полно описывающие
@@ -66,5 +71,13 @@ export function getDeviceFromFile(content: any): IDevice {
   //есть слоты, есть параметры которые надо разместить в слотах
   //надо запустить порты, запустить линк-менеджеры, заполнить слоты,
   //организовать считывание данных
-  return;
+  const result: IDevice = {
+    name,
+    ID,
+    ram,
+    flash,
+    cd,
+    vars
+  }
+  return result;
 }

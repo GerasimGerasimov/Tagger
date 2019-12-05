@@ -36,7 +36,9 @@ export class TVars {
     }
     //задаю Key, и массив, получаю value=array[key] или null
     private getScaleValueByKey(key: string): string {
-        return this.VarsMap.get(key);
+        const result = this.VarsMap.get(key);
+        if (result === undefined) console.log(`getScaleValueByKey: ${key} does not exist`);
+        return result;
     }
     
     private getValueFromListedScale(options: string): number {
@@ -52,10 +54,6 @@ export class TVars {
                     //почему в последнем? потому что в среднем
                     //может находится а может не находится комментарий 
                     return StrToFloat(b[b.length-1], 1.0);                   
-                    //const f: number = parseFloat(b[b.length-1].replace(",","."));
-                    //return (!isNaN(f))
-                    //    ? f
-                    //    : 1.0; //значение по умолчанию, если не преобразовался в число
                 }
             }
         }
@@ -81,16 +79,18 @@ export class TVars {
     }
 
     public getScaleValue(NameAndOptions: string): number {
+        var result: number = 1.0;
         const options: IScaleOptions = this.getScaleOption(NameAndOptions);
         //в o.ScaleName содержится ключ, надо найти его Value в массиве VARS
         const value: string = this.getScaleValueByKey(options.ScaleName);
-        var f: number = parseFloat(value.replace(",","."));
-        f = (!isNaN(f))
-            ? f
+        if (value !== undefined)
+            result = parseFloat(value.replace(",","."));
+        result = (!isNaN(result))
+            ? result
             : this.getScaleValueFromOptional(value, options);
         //применить мат операции если есть
-        f = this.tryToApplyMath(f, options);
-        return f;
+        result = this.tryToApplyMath(result, options);
+        return result;
     }
 
     //короче, шкала может быть:

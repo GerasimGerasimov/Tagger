@@ -29,7 +29,17 @@ const DevicesFilesProps:Array<utils.IDirСontents> =  utils.getFilesProps(Device
     p03200=Usgz/Заданное напряжение статора/TFloat/x0040/r0020/B/1/4/0/
     буду класть параметры в SET поэтому названия должны быть уникальными
 */
-const dev: device.IDevice = device.getDeviceFromFile(DevicesFilesProps[0].Content);
+function getDevicesTags(DevicesFilesProps:Array<utils.IDirСontents>): Array<device.IDevice> {
+    const result: Array<device.IDevice> = [];
+    DevicesFilesProps.forEach(item => {
+        result.push(device.getDeviceFromFile(item.FileName, item.Content))
+    })
+    return result;
+}
+
+const DevsTags: Array<device.IDevice> = getDevicesTags(DevicesFilesProps);
+console.log(DevsTags);
+//const dev: device.IDevice = device.getDeviceFromFile(DevicesFilesProps[0].Content);
 //потом, зная ноду и утройство я буду обращаться
 /*{
     Node: node1, - нода

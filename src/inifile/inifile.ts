@@ -77,3 +77,16 @@ export function getSectionListFromBuffer(section: string, buff: Array<string>): 
 export function isSection(section:string, buff: Array<string>){
     return (getSectionBegin (`[${section}]`, loadLinesFromBuffer(buff)) != undefined)? true : false;
 }
+
+//получить конкретную строку из списка строк
+export function getValueByKeyFromList(key: string, content: Array<string>, defvalue: string = ''): string {
+    var result: string = defvalue;
+    let idx = content.length;
+    while (idx-- != 0) {
+        let item = content[idx];
+        let i = item.indexOf('=');
+        if (item.slice(0,i) === key)
+            return item.slice(i+1);        
+    }
+    return result;
+}
