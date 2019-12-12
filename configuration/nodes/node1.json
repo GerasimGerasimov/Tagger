@@ -4,16 +4,6 @@
         "url": "localhost",
         "port": 5000
     },
-    "COM":{
-        "port":"COM3",
-        "settings": {
-              "baudRate": 115200,
-              "dataBits": 8,
-              "parity": "none",
-              "stopBits": 1,
-              "flowControl": false
-          }
-    },
     "fieldbus":"ModbusRTU",
     "Devices":[
         {
@@ -21,6 +11,46 @@
             "addr":[
                 {"U1":1},
                 {"U2":1}
+            ],
+            "slots":{
+                "RAM": {
+                    "section":"RAM",
+                    "range":"all",
+                    "timeOut": {
+                        "read": 100,
+                        "write": 100
+                    },
+                    "NotRespond": false,
+                    "interval":0
+                },
+                "FLASH": {
+                    "section":"FLASH",
+                    "range":"all",
+                    "TimeOut": {
+                        "read": 100,
+                        "write": 100
+                    },
+                    "NotRespond": false,
+                    "interval":1000
+                },
+                "CD": {
+                    "section":"CD",
+                    "range":{"from":"p06402", "to":"p08700"},
+                    "TimeOut": {
+                        "read": 100,
+                        "write": 100
+                    },
+                    "NotRespond": false,
+                    "interval":1000
+                }
+            }
+
+        },
+        {
+            "source":"vteg_v1.15.ini",
+            "addr":[
+                {"U3":1},
+                {"U4":1}
             ],
             "slots":{
                 "RAM": {
@@ -55,6 +85,6 @@
                 }
             }
 
-        }       
+        }                 
     ]
 }

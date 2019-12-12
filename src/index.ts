@@ -1,6 +1,6 @@
 import fs = require('fs');
 import * as utils from './utils/utils';
-import * as device from './devices/device'
+import * as device from './devices/ModelDevice'
 //читаю содержимое папки configuration
 const ConfDirName:string = './configuration';
 const NodesDir: string = `${ConfDirName}/nodes`;
@@ -29,15 +29,9 @@ const DevicesFilesProps:Array<utils.IDirСontents> =  utils.getFilesProps(Device
     p03200=Usgz/Заданное напряжение статора/TFloat/x0040/r0020/B/1/4/0/
     буду класть параметры в SET поэтому названия должны быть уникальными
 */
-function getDevicesTags(DevicesFilesProps:Array<utils.IDirСontents>): Array<device.IDevice> {
-    const result: Array<device.IDevice> = [];
-    DevicesFilesProps.forEach(item => {
-        result.push(device.getDeviceFromFile(item.FileName, item.Content))
-    })
-    return result;
-}
 
-const DevsTags: Array<device.IDevice> = getDevicesTags(DevicesFilesProps);
+//получаю список тегов из всех ini из папки /configuration/devices/
+const DevsTags: Array<device.IModelDevice> = device.getDevicesTags(DevicesFilesProps);
 console.log(DevsTags);
 //const dev: device.IDevice = device.getDeviceFromFile(DevicesFilesProps[0].Content);
 //потом, зная ноду и утройство я буду обращаться
@@ -56,9 +50,74 @@ console.log(DevsTags);
         }        
     }
 */
-/*
-const DirsContent:Array<utils.IDirСontents> =  utils.getDirsContent(ConfDirName, DirList);
-console.log(DirsContent);
-const settings = JSON.parse(fs.readFileSync('./configuration/node1/config.json', 'utf8'));
-console.log(settings);
-*/
+//Теперь распарсить список нод NodesFilesProps
+//найти все addr [U1, U2 ...]
+
+class TPositionNameAndFieldBusAdress {
+    name: string = '';//обозначение устройства на схеме
+    addr: number = 1; //адрес в сети или полевой шине
+}
+
+class TNodeDevices {
+    source: string;
+    addr: Array<TPositionNameAndFieldBusAdress>;
+    slots:Object = {}
+}
+
+class TAddressableDevice {
+    source: string = ''; //название ini-файла
+    PositionName: string = ''; //обозначение устройства на схеме
+    FieldBusAddr: number = 1;//адрес в сети или полевой шине
+    Tags: device.IModelDevice = undefined;//доступные теги, требуется последующее заполнение
+    SlotsDescription: Object = {};//описание слотов в JSON-формате, требуется последующая обработка
+}
+
+function ObjectToAdressableDevice(o:Object): TPositionNameAndFieldBusAdress {
+    const result: TPositionNameAndFieldBusAdress = new TPositionNameAndFieldBusAdress();
+    for (let key in o) {
+        result.name = key;
+        result.addr = o[key]
+    }
+    return result; 
+}
+const DevicesMap = new  Map<string, TAddressableDevice>();
+
+function getDev(PositionNameAndFieldBusAdress:TPositionNameAndFieldBusAdress, item: TNodeDevices): TAddressableDevice {
+    let result:  TAddressableDevice = new  TAddressableDevice();
+    result.source = item.source;
+    result.FieldBusAddr = PositionNameAndFieldBusAdress.addr;
+    result.PositionName = PositionNameAndFieldBusAdress.name;
+    result.SlotsDescription = item.slots;    
+    return result;
+}
+
+function parseNodeDevList(devs: Array<Object>): any {
+    devs.forEach((item: TNodeDevices)=>{
+        item.addr.forEach((e) => {
+            let o:TPositionNameAndFieldBusAdress = ObjectToAdressableDevice(e);
+            const result = DevicesMap.get(o.name);
+            if (result === undefined) {
+                let device: TAddressableDevice = getDev(o, item)//создать объект привязанный к U1
+                DevicesMap.set(o.name, device);
+            } else {
+                console.log(`Device: ${o.name} at addr: ${o.addr} already exists`)
+            }
+        })
+    })
+}
+
+function parseNodeList(props:Array<utils.IDirСontents>): any{
+    var result: Array<any> = [];
+    props.forEach(item => {
+        var o = JSON.parse(item.Content)
+        const FieldBus: string = o.fieldbus;
+        const name: string = o.name;
+        const HOST: string = o.HOST;
+        const d = parseNodeDevList(o.Devices || []);
+        result.push(o);
+    })
+    return result;
+}
+
+const Nodes: any = parseNodeList (NodesFilesProps); 
+console.log(Nodes);

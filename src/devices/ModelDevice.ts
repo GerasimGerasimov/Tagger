@@ -1,6 +1,7 @@
 import * as ini from '../inifile/inifile';
 import { TVars } from './TVars'
 import { TParameters } from './TParameters'
+import * as utils from '../utils/utils';
 //ini превращаю в теги типа
 /*{ name: vteg_v1.15,
     RAM:{Iexc:{параметры}, , , , },
@@ -22,7 +23,7 @@ interface IScale {
     name: string;
 }
 
-export interface IDevice {
+export interface IModelDevice {
     name: string;//название устройства (имя файла ini)
     ID: string;//строка идентификации
     ram:   TParameters;
@@ -31,7 +32,15 @@ export interface IDevice {
     vars:  TVars;
 }
 
-export function getDeviceFromFile(name: string, content: any): IDevice {
+export function getDevicesTags(DevicesFilesProps:Array<utils.IDirСontents>): Array<IModelDevice> {
+  const result: Array<IModelDevice> = [];
+  DevicesFilesProps.forEach(item => {
+      result.push(getDeviceFromFile(item.FileName, item.Content))
+  })
+  return result;
+}
+
+export function getDeviceFromFile(name: string, content: any): IModelDevice {
   content = ini.loadLinesFromBuffer(content);
   console.log(content);
   //ID
@@ -71,7 +80,7 @@ export function getDeviceFromFile(name: string, content: any): IDevice {
   //есть слоты, есть параметры которые надо разместить в слотах
   //надо запустить порты, запустить линк-менеджеры, заполнить слоты,
   //организовать считывание данных
-  const result: IDevice = {
+  const result: IModelDevice = {
     name,
     ID,
     ram,

@@ -4,23 +4,13 @@
         "url": "localhost",
         "port": 5000
     },
-    "COM":{
-        "port":"COM3",
-        "settings": {
-              "baudRate": 115200,
-              "dataBits": 8,
-              "parity": "none",
-              "stopBits": 1,
-              "flowControl": false
-          }
-    },
     "fieldbus":"ModbusRTU",
     "Devices":[
         {
             "source":"vteg_v1.15.ini",
             "addr":[
-                {"U1":1},
-                {"U2":1}
+                {"U5":1},
+                {"U6":1}
             ],
             "slots":{
                 "RAM": {
