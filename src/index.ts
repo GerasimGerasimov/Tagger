@@ -4,7 +4,7 @@ import * as device from './devices/ModelDevice'
 //читаю содержимое папки configuration
 const ConfDirName:string = './configuration';
 const NodesDir: string = `${ConfDirName}/nodes`;
-const DevicesDir: string = `${ConfDirName}/devices`;
+const DevicesDir: string = `${ConfDirName}/ini`;
 //получаю список директорий в директории configuration
 //должны присутсвовать nodes и devices - иначе на выход
 //проверка существования директорий
