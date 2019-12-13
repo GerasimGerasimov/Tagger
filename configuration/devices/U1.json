@@ -1,6 +1,6 @@
 {
-    "name":"node1",
-    "source":"sbfcb8.ini",
+    "host":"node1",
+    "source":"smfcb8.ini",
     "addr":1,
     "slots":{
         "RAM": {

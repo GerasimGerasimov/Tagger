@@ -1,5 +1,5 @@
 {
-    "name":"node1",
+    "host":"node1",
     "source":"vteg_v1.15.ini",
     "addr":2,
     "slots":{

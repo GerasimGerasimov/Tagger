@@ -1,5 +1,7 @@
 import fs = require('fs');
 
+export const ConfDirName:string = './configuration';
+
 export function validateFolderExistence(dirName: string): void {
     if (!fs.existsSync(dirName)) throw new Error(`Folder not exist: ${dirName}`)
 }
@@ -24,4 +26,10 @@ export function getFilesProps(root: string, FolderContentList: Array<string>):Ar
         } as IDirСontents);
     })
     return result;
+}
+
+export function getNameFromFileName(filename: string): string {
+    let i = filename.lastIndexOf('.json');
+    let s = filename.slice(0, i);
+    return s;
 }

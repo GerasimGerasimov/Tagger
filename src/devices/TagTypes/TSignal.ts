@@ -1,6 +1,6 @@
 //Контейнер для параметров из RAM/FLASH/CD
 import { TVars } from './TVars'; // шкалы
-import { StrToFloat} from '../utils/miscel'
+import { StrToFloat} from '../../utils/miscel'
 
 //  s   [0]    [1]       [2]     [3]  [4]      [5]       [6]     [7]
 //WORD=name/comments/objecttype/addr/mbreg/measure unit/scale/bytesize/

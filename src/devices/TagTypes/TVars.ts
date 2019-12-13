@@ -4,7 +4,7 @@
 //тут парсится массив строк из секции [vars] в объект шкал
 //а так же отдаёт значения заданной шкалы по требованию
 //IsScale%1,8
-import { StrToFloat} from '../utils/miscel'
+import { StrToFloat} from '../../utils/miscel'
 
 interface IScaleOptions {
     ScaleName:  string; // IsScale

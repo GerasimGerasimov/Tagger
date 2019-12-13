@@ -1,6 +1,6 @@
 import { TVars } from './TVars'; // шкалы
 import { TSignal } from './TSignal';
-import { StrToFloat} from '../utils/miscel'
+import { StrToFloat} from '../../utils/miscel'
 
 //typical
 //  s   [0]    [1]       [2]     [3]  [4]      [5]       [6]     [7]      [8]
