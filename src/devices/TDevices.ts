@@ -4,14 +4,14 @@ import TTagsSource from './TTagsSource';
 
 const DevicesDir: string = `${utils.ConfDirName}/devices`;//ту хранятся U1, U2 и т.п.
 
-class TNodeDevices {
+export class TNodeDevices {
     addr: number;
     host: string;
     source: string;
     slots:Object = {}
 }
 
-class TAddressableDevice {
+export class TAddressableDevice {
     host: string = '';//имя хоста
     source: string = ''; //название ini-файла
     PositionName: string = ''; //обозначение устройства на схеме
@@ -20,7 +20,7 @@ class TAddressableDevice {
     SlotsDescription: Object = {};//описание слотов в JSON-формате, требуется последующая обработка
 }
 
-export default class TDevices {
+export class TDevices {
     public DevicesMap = new  Map<string, TAddressableDevice>();
 
     constructor(TagsSource: TTagsSource){

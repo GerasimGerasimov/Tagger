@@ -3,13 +3,13 @@ import * as utils from '../utils/utils';
 const HostsDir: string = `${utils.ConfDirName}/nodes`;
 
 //Карта Хостов
-class THost {
+export class THost {
     fieldbus: string = '';//адрес в сети или полевой шине
     URL: string = 'localhost';
     port: number = 5000;
 }
 
-export default class THosts {
+export class THosts {
     public HostsMap = new  Map<string, THost>();
     constructor(){
         utils.validateFolderExistence(HostsDir);
