@@ -6,7 +6,7 @@
         "RAM": {
             "section":"RAM",
             "range":"all",
-            "timeOut": {
+            "TimeOut": {
                 "read": 100,
                 "write": 100
             },

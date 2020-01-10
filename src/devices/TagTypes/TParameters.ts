@@ -16,6 +16,10 @@ export class TParameters {
         this.parseListToMap(ParametersList); 
     }
 
+    get valuesMap(): Map<string, TSignal> {
+        return this.ValuesMap;
+    }
+
     private getObjTypeFromIni(ini: string): string {
         const i = ini.indexOf('=');
         const value: Array<string> = ini.slice(i+1).split(/[/]/);// получил массив

@@ -1,6 +1,8 @@
 import fs = require('fs');
 import * as utils from './utils/utils';
-import * as device from './devices/ModelDevice'
+import {TFieldBus, TSlotSource, TSlotSet} from './fieldbus/TFieldBus'
+import {TFieldBusModbusRTU} from './fieldbus/TFieldBusModbusRTU'
+
 import {THosts, THost} from './devices/THosts';
 import TTagsSource from './devices/TTagsSource';
 import {TDevices, TAddressableDevice} from './devices/TDevices';
@@ -20,18 +22,19 @@ console.log(Devices);
 //3. вытащит нужные теги из Tags
 // 
 
-class TFieldBus {
-
-}
-
-class TFieldBusModbusRTU implements TFieldBus {
-
-}
-
 Hosts.HostsMap.forEach((Host:THost, HostName:string) => {
-    console.log(HostName, Host);
-    Devices.DevicesMap.forEach ((DevicePropertyes: TAddressableDevice, DeviceName: string)=>{
-        console.log(HostName, Host);
-        console.log(DeviceName, DevicePropertyes);
+    //console.log(HostName, Host);
+    const FieldBus:TFieldBus = new TFieldBusModbusRTU();
+    Devices.DevicesMap.forEach ((DeviceProperties: TAddressableDevice, DeviceName: string)=>{
+        //console.log(HostName, Host);
+        //console.log(DeviceName, DeviceProperties);
+        FieldBus.Tags  = DeviceProperties.Tags;
+        FieldBus.FieldBusAddr = DeviceProperties.FieldBusAddr;
+        for (const SlotSourceKey in DeviceProperties.SlotsDescription) {
+            const SlotSourceValue: TSlotSource = DeviceProperties.SlotsDescription[SlotSourceKey];
+            const Slot:TSlotSet = FieldBus.createSlot(DeviceProperties.PositionName, SlotSourceValue);
+            console.log(Slot)
+            // TODO (:nodes): привязка слотов к нодам
+        }
     });
 });
