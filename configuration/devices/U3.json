@@ -1,7 +1,7 @@
 {
     "host":"node2",
     "source":"vteg_v1.15.ini",
-    "addr":2,
+    "addr":3,
     "slots":{
         "RAM": {
             "section":"RAM",

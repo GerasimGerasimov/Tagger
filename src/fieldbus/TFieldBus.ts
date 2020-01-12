@@ -1,13 +1,5 @@
 import * as device from '../devices/ModelDevice'
-
-//результат выполнения TFieldBus.createSlot
-export class TSlotSet {
-    ID: string = ''; //ID слота
-    cmd: Array<any> = []; //команда слейву
-    interval?: number = 0; //частота активации слота в милисекундах
-    NotRespond: boolean = false;//true - команда в out не требует ответа на неё
-    TimeOut: number = 100;//время ожидания ответа устройства
-}
+import {TSlotSet} from '../slots/TSlotSet'
 
 class TTimeOut {
     read:number = 100;
@@ -42,7 +34,7 @@ export abstract class TFieldBus {
         return this.tags[section.toLowerCase()];
     }
 
-    createSlot(PositionName: string, Source: TSlotSource):  TSlotSet {
+    public createReadSlot(PositionName: string, Source: TSlotSource):  TSlotSet {
         let result: TSlotSet;
         return result;
     }

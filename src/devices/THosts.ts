@@ -1,14 +1,9 @@
+import {THost} from './THost'
 import * as utils from '../utils/utils';
 
 const HostsDir: string = `${utils.ConfDirName}/nodes`;
 
 //Карта Хостов
-export class THost {
-    fieldbus: string = '';//адрес в сети или полевой шине
-    URL: string = 'localhost';
-    port: number = 5000;
-}
-
 export class THosts {
     public HostsMap = new  Map<string, THost>();
     constructor(){
@@ -22,6 +17,7 @@ export class THosts {
         props.forEach(item => {
             var o = JSON.parse(item.Content)
             const Host:THost = new THost();
+            Host.Name = o.name;
             Host.fieldbus = o.fieldbus;
             Host.URL = o.HOST.url;
             Host.port = o.HOST.port;

@@ -1,4 +1,5 @@
-import {TFieldBus, TSlotSource, TSlotSet } from './TFieldBus'
+import {TFieldBus, TSlotSource} from './TFieldBus'
+import {TSlotSet} from '../slots/TSlotSet'
 import {TParameters} from '../devices/TagTypes/TParameters'
 import { TSignal } from '../devices/TagTypes/TSignal';
 import {getCRC16, appendCRC16toArray} from './crc/crc16'
@@ -14,7 +15,7 @@ export class TFieldBusModbusRTU extends TFieldBus {
         super();
     }
 
-    public createSlot(PositionName: string, Source: TSlotSource):  TSlotSet {
+    public createReadSlot(PositionName: string, Source: TSlotSource):  TSlotSet {
         let range: TRegsRange = undefined;
         let tags: TParameters = this.Tags[Source.section.toLowerCase()];
         if (tags !== undefined) {
@@ -33,7 +34,7 @@ export class TFieldBusModbusRTU extends TFieldBus {
         return undefined;
     }
 
-    private getRegsRange(range: any, tags: TParameters): TRegsRange{
+    private getRegsRange(range: any, tags: TParameters): TRegsRange {
         //доступный диапазон регистров в Tags
         const AvailableRegsRange: TRegsRange = this.getAvailableRegsRangeOfTags(tags);
         //требуемый диапазон регистров в слоте
@@ -80,7 +81,7 @@ export class TFieldBusModbusRTU extends TFieldBus {
     */
     private getRequireRegsRange (range: any, AvailableRegsRange: TRegsRange) : TRegsRange{
         if (range === "all") return AvailableRegsRange;
-        return undefined;
+        throw new Error(`getRequireRegsRange : range ${range} is not available`)
         // TODO (:range): добавить from ... to
     }
 
