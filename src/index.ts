@@ -38,7 +38,7 @@ Hosts.HostsMap.forEach((Host:THost, HostName:string) => {
                 const Slot:TSlotSet = FieldBus.createReadSlot(DeviceProperties.PositionName, SlotSourceValue);
                 console.log(Slot)
                 // TODO (:nodes): привязка слотов к нодам в вернее к хостам
-                Host.addSlot(Slot);
+                Host.addSlotToMap(Slot);
             } catch (e) {
                 console.log(e)
             }
@@ -53,5 +53,8 @@ Hosts.HostsMap.forEach((Host:THost) => {
         console.log(item)
     });
 });
+
+//передам СлотСеты реальным хостам используя API /v1/slots/put
+Hosts.sendSlotSetsToHosts();
 
 console.log('THE END');

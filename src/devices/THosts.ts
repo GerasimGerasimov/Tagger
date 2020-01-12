@@ -12,6 +12,11 @@ export class THosts {
         let NodesFilesProps = utils.getFilesProps(HostsDir, HostsDirList);
         this.parseNodeList(NodesFilesProps);
     }
+    public sendSlotSetsToHosts(){
+        this.HostsMap.forEach((Host:THost)=>{
+            Host.setSlotSetsToHost();
+        })
+    }
 
     private parseNodeList(props:Array<utils.IDirСontents>) {
         props.forEach(item => {
@@ -20,7 +25,6 @@ export class THosts {
             Host.Name = o.name;
             Host.fieldbus = o.fieldbus;
             Host.URL = o.HOST.url;
-            Host.port = o.HOST.port;
             this.HostsMap.set(o.name, Host);
         })
     }
