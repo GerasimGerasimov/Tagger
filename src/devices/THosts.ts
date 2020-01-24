@@ -28,4 +28,8 @@ export class THosts {
             this.HostsMap.set(o.name, Host);
         })
     }
+
+    public getHostByName(name: string) {
+        return this.HostsMap.get(name);
+    }
 }

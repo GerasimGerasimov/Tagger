@@ -3,8 +3,18 @@
     "source":"vteg_v1.15.ini",
     "addr":1,
     "slots":{
-        "RAM": {
+        "U1:RAM": {
             "section":"RAM",
+            "range":"all",
+            "TimeOut": {
+                "read": 100,
+                "write": 100
+            },
+            "NotRespond": false,
+            "interval":0
+        },
+        "U1:FLASH": {
+            "section":"FLASH",
             "range":"all",
             "TimeOut": {
                 "read": 100,

@@ -19,10 +19,7 @@ export default class HostController {
                 .then (this.validationJSON);
         } catch(e) {
             console.log(e);
-            return {
-                status: 'Error',
-                msg: `Fetch Error: ${e.message}`
-            } as IErrorMessage;
+            throw new Error (`Fetch Error: ${e.message}`);
         }
     }
 
@@ -35,7 +32,26 @@ export default class HostController {
         try {
             return JSON.parse(data);
         } catch (e) {
-            return {status: 'Error', msg: 'Invalid JSON'} as IErrorMessage;
+            throw new Error ('Invalid JSON');
+        }
+    }
+
+    public static async getSlotDataByID(host: string, ID: string):Promise<any | IErrorMessage> {
+        try {
+            const header: any = {
+                method: 'GET',
+                mode: 'cors',
+                cache: 'no-cache',
+                headers: {
+                    'Content-Type':'application/json; charset=utf-8',
+                }
+            }
+            return await fetch(`${host}/v1/slots/${ID}`, header)
+                .then (this.handledHTTPResponse)
+                .then (this.validationJSON);
+        } catch(e) {
+            console.log(e);
+            throw new Error (`Fetch Error: ${e.message}`);
         }
     }
 

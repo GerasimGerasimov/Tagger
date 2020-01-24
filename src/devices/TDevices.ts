@@ -37,7 +37,7 @@ export class TDevices {
             const name = utils.getNameFromFileName(item.FileName);
             const result = this.DevicesMap.get(name);
             if (result === undefined) {
-                let device: TAddressableDevice = this.getDev(name, o)//создать объект привязанный к U1
+                let device: TAddressableDevice = this.createNewAddressableDevice(name, o)//создать объект привязанный к U1
                 this.DevicesMap.set(name, device);
             } else {
                 console.log(`Device: ${name} at addr: ${o.addr} already exists`)
@@ -45,7 +45,7 @@ export class TDevices {
         })
     }
 
-    private getDev(name:string, item:TNodeDevices): TAddressableDevice {
+    private createNewAddressableDevice(name:string, item:TNodeDevices): TAddressableDevice {
         let result:  TAddressableDevice = new  TAddressableDevice();
         result.host = item.host;
         result.source = item.source;
@@ -68,4 +68,15 @@ export class TDevices {
             dev.Tags = this.fillTags(dev.source, TagsSource);
         }
     }
+
+    public getAddressableDeviceByPositionName(req: any): TAddressableDevice {
+        for (const key in req) {
+            //будет только один объект
+            if (this.DevicesMap.has(key))
+                return this.DevicesMap.get(key)
+                else   throw new Error (`${key} doesn't exist in DevicesMap`)
+        }
+    }
+
+
 }

@@ -1,7 +1,7 @@
 import fs = require('fs');
 import * as utils from './utils/utils';
 import {TFieldBus, TSlotSource} from './fieldbus/TFieldBus'
-import {TSlotSet} from './slots/TSlotSet'
+import {TSlot, TSlotSet} from './slots/TSlotSet'
 import {TFieldBusModbusRTU} from './fieldbus/TFieldBusModbusRTU'
 
 import {THosts} from './devices/THosts';
@@ -35,10 +35,9 @@ Hosts.HostsMap.forEach((Host:THost, HostName:string) => {
         for (const SlotSourceKey in DeviceProperties.SlotsDescription) {
             try {
                 const SlotSourceValue: TSlotSource = DeviceProperties.SlotsDescription[SlotSourceKey];
-                const Slot:TSlotSet = FieldBus.createReadSlot(DeviceProperties.PositionName, SlotSourceValue);
-                console.log(Slot)
-                // TODO (:nodes): привязка слотов к нодам в вернее к хостам
-                Host.addSlotToMap(Slot);
+                const SlotSet:TSlotSet = FieldBus.createReadSlot(DeviceProperties.PositionName, SlotSourceValue);
+                console.log(SlotSet)
+                Host.addSlotSetToMap(SlotSet);
             } catch (e) {
                 console.log(e)
             }
@@ -49,12 +48,46 @@ Hosts.HostsMap.forEach((Host:THost, HostName:string) => {
 //выведу список Хостов и связанных с ними Слотов
 Hosts.HostsMap.forEach((Host:THost) => {
     console.log(Host.Name);
-    Host.SlotsMap.forEach((item: TSlotSet)=>{
+    Host.SlotsMap.forEach((item: TSlot)=>{
         console.log(item)
     });
 });
 
 //передам СлотСеты реальным хостам используя API /v1/slots/put
 Hosts.sendSlotSetsToHosts();
+
+/* TODO (:respond) сделать ответ на запрошенный JSON с параметрами устройства
+{
+    U1:{
+        RAM:{//название слота
+            ALL или [Iexc, Uexc]
+        }
+    }
+}
+А в ответ:
+    {
+        status:'OK',
+        message:'всё норм',
+        U1 {
+            'U1:RAM' {//название слота
+                Iexc: 100A      //названя и значения параметров
+                Uexc: undefined //-----------------------------
+            }
+        }
+    }
+*/
+
+const U1_request = {
+    U1:{
+        'U1:RAM':['Iexc', 'Uexc']
+    }
+}
+
+//В AddressableDevice находится ссылка на host и
+// tags в которых есть RAM, FLASH и т.п.
+const AddressableDevice: TAddressableDevice = Devices.getAddressableDeviceByPositionName(U1_request);
+const host:THost = Hosts.getHostByName(AddressableDevice.host);
+//из запроса выделить название слота 'U1:RAM'
+/* TODO (:slot name) перейти на названия 'U1:RAM' см TFieldBusModbusRTU.createReadSlot*/
 
 console.log('THE END');

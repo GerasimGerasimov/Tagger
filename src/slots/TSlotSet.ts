@@ -1,3 +1,10 @@
+export class TSlot {
+    status: string = ''
+    msg: any;
+    slotSet: TSlotSet = undefined;
+    slotRAWData: [] = [];//сырые данные от устройства
+}
+
 export class TSlotSet {
     ID: string = ''; //ID слота
     cmd: Array<any> = []; //команда слейву

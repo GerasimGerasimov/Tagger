@@ -1,4 +1,4 @@
-import {TSlotSet} from '../slots/TSlotSet'
+import {TSlot, TSlotSet} from '../slots/TSlotSet'
 import HostController from '../controllers/hostscontroller'
 
 export class THost {
@@ -6,20 +6,39 @@ export class THost {
     public fieldbus: string = '';//адрес в сети или полевой шине
     public URL: string = 'localhost';
 
-    public SlotsMap = new  Map<string, TSlotSet>();
+    public SlotsMap = new  Map<string, TSlot>();
 
-    public addSlotToMap(Slot: TSlotSet){
-        this.SlotsMap.set(Slot.ID, Slot)
+    public addSlotSetToMap(SlotSet: TSlotSet){
+        const Slot = new TSlot();
+        Slot.status = 'Error'; //статус Error - нельзя верить данным
+        Slot.slotSet = SlotSet;
+        this.SlotsMap.set(SlotSet.ID, Slot)
     }
 
     //передам СлотСеты реальному хосту используя API PUT /v1/slots/
     public async setSlotSetsToHost(){
         for (const Slot of this.SlotsMap.values()) {
             try {
-                await HostController.putSlotSetToHost(this.URL, Slot)
+                let result = await HostController.putSlotSetToHost(this.URL, Slot.slotSet);
+                console.log(result);
+                Slot.status = 'SlotSet added';
+                Slot.msg = '';
             } catch (e) {
                 console.log(e);
+                Slot.status = 'Error';
+                Slot.msg = e;
             }
+        }
+    }
+
+    public async getSlotData(Slot:TSlot){
+        try {
+            let result = await HostController.getSlotDataByID(this.URL, Slot.slotSet.ID);
+            console.log(result);
+        } catch(e) {
+            console.log(e);
+            Slot.status = 'Error';
+            Slot.msg = e;
         }
     }
 }
