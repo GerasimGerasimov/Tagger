@@ -46,7 +46,8 @@ export default class HostController {
                     'Content-Type':'application/json; charset=utf-8',
                 }
             }
-            return await fetch(`${host}/v1/slots/${ID}`, header)
+            const url:string = `${host}/v1/slot/${ID}`;
+            return await fetch(url, header)
                 .then (this.handledHTTPResponse)
                 .then (this.validationJSON);
         } catch(e) {

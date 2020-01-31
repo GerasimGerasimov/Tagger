@@ -7,7 +7,7 @@ import {TFieldBusModbusRTU} from './fieldbus/TFieldBusModbusRTU'
 import {THosts} from './devices/THosts';
 import {THost} from './devices/THost';
 import TTagsSource from './devices/TTagsSource';
-import {TDevices, TAddressableDevice} from './devices/TDevices';
+import {TDevices, TAddressableDevice, TSlotsDataRequest } from './devices/TDevices';
 const Hosts: THosts = new THosts();
 const TagsSource: TTagsSource = new TTagsSource();
 const Devices: TDevices = new TDevices(TagsSource);
@@ -79,15 +79,24 @@ Hosts.sendSlotSetsToHosts();
 
 const U1_request = {
     U1:{
-        'U1:RAM':['Iexc', 'Uexc']
+        'RAM':['Iexc', 'Uexc'],
+        'FLASH':'ALL',
     }
 }
 
 //В AddressableDevice находится ссылка на host и
 // tags в которых есть RAM, FLASH и т.п.
-const AddressableDevice: TAddressableDevice = Devices.getAddressableDeviceByPositionName(U1_request);
-const host:THost = Hosts.getHostByName(AddressableDevice.host);
-//из запроса выделить название слота 'U1:RAM'
-/* TODO (:slot name) перейти на названия 'U1:RAM' см TFieldBusModbusRTU.createReadSlot*/
+const SlotsDataRequest :TSlotsDataRequest  = Devices.getSlotsDataRequest(U1_request);
+const host:THost = Hosts.getHostByName(SlotsDataRequest.Host);
 
+//теперь есть Host и имена слотов, можно обращаться к Хосту за данными
+//по именам слотов
+async function getSlotsData() {
+    for (const SlotDataRequest of SlotsDataRequest.SlotDataRequest){
+        const slot: TSlot = host.SlotsMap.get(SlotDataRequest.SlotName);
+        await host.getSlotData(slot)
+    }
+}
+
+getSlotsData();
 console.log('THE END');

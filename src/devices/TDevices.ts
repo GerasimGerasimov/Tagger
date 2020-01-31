@@ -20,6 +20,23 @@ export class TAddressableDevice {
     SlotsDescription: Object = {};//описание слотов в JSON-формате, требуется последующая обработка
 }
 
+export class TSlotDataRequest {
+    SectionName: string = '';
+    SlotName: string ='';
+    Request: any;
+}
+
+export class TSlotsDataRequest {
+    AddressableDevice: TAddressableDevice = undefined;
+    SlotDataRequest:Array<TSlotDataRequest> = [];
+    get Host(): string {
+        return this.AddressableDevice.host;
+    }
+    get PositionName(): string {
+        return this.AddressableDevice.PositionName;
+    }    
+}
+
 export class TDevices {
     public DevicesMap = new  Map<string, TAddressableDevice>();
 
@@ -78,5 +95,27 @@ export class TDevices {
         }
     }
 
-
+    public getSlotsDataRequest(req: any): TSlotsDataRequest {
+        const result:TSlotsDataRequest = new TSlotsDataRequest ();
+        try {
+            for (const key in req) {//key - название устройства (типа U1)        
+                if (this.DevicesMap.has(key))
+                    result.AddressableDevice = this.DevicesMap.get(key)
+                else 
+                    throw new Error (`${key} doesn't exist in DevicesMap`)
+                //теперь в req найти объекты 2-го уровня вложенности
+                const NestedObjects: any = req[key];
+                for (let key in NestedObjects) {
+                    const SlotDataRequest: TSlotDataRequest = new TSlotDataRequest ()
+                    SlotDataRequest.SectionName = key;
+                    SlotDataRequest.SlotName = `${result.PositionName}:${SlotDataRequest.SectionName}`;
+                    SlotDataRequest.Request = NestedObjects[key];
+                    result.SlotDataRequest.push(SlotDataRequest);
+                }
+            }
+        } catch (e) {
+            throw new Error (`Wrong reguest ${req}: ${e}`)
+        }     
+        return result
+    }
 }

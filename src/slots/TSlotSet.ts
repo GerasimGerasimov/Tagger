@@ -2,6 +2,7 @@ export class TSlot {
     status: string = ''
     msg: any;
     slotSet: TSlotSet = undefined;
+    lastUpdateTime?: number;//время последнего валидного обновления данных 
     slotRAWData: [] = [];//сырые данные от устройства
 }
 
