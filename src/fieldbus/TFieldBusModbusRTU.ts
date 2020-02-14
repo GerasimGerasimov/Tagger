@@ -106,26 +106,32 @@ export class TFieldBusModbusRTU extends TFieldBus {
         //if (data[0] != this.FieldBusAddr)    throw new Error (`TFieldBus Device Back Address Error: ${this.FieldBusAddr} expected, but ${data[0]} returned`);
     }
 
-    //удалить протокольные байты и сделать swap байтов
+    /*удалить протокольные байты и сделать swap байтов
+    формат: AD,C,BCNT,DATA[swapped u16],CRC(h,l)
+             │ │  │       │              └─ (word)crc16
+             │ │  │       └────────── Data Array swapped U16
+             │ │  └────────────────── Count - кол-во байт данных
+             | |______________________03 - номер команды
+             |________________________aдрес
+    */
     public getRawData(data: Array<any>): Array<any> {
-        const source = Uint8Array.from(data);
-        const count: number = source[2];
-        //const dest = source.subarray(3, source.length-2);
-        const dest = new Uint16Array(count / 2);
-        //теперь swap
-        let dataView = new DataView (source.buffer, 3, count);
-        let destIndex = 0;
-        let sourceIndex = 0;
-        let i = count / 2;
-        while (i--) {
-            let lo = dataView.getUint8(sourceIndex+0);
-            let hi = dataView.getUint8(sourceIndex+1);
-            let reg = (hi << 8 | lo);
-            dest[destIndex] =  reg;
-            destIndex ++;
-            sourceIndex +=2;
-        }
+        const count: number = data[2];
+        const source = Uint8Array.from(data.slice(3,data.length-2));
+        const dest: Uint16Array = this.swapU8ArrayToU16(source)
         console.log(dest);
         return[]
+    }
+
+    private swapU8ArrayToU16(source: Uint8Array): Uint16Array{
+        let destIdx: number = 0;
+        let sourceIdx: number = 0;
+        let i: number = source.length / 2;
+        const result = new Uint16Array(i);
+        while (i--) {
+            let reg: number = (source[sourceIdx+0] << 8 | source[sourceIdx+1]);
+            result[destIdx ++] =  reg;
+            sourceIdx +=2;
+        }
+        return result;
     }
 }
