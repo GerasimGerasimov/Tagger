@@ -38,4 +38,11 @@ export abstract class TFieldBus {
         let result: TSlotSet;
         return result;
     }
+
+    public checkInputData(data: Array<any>) {
+    }
+
+    public getRawData(data: Array<any>): Array<any> {
+        return[]
+    }
 }

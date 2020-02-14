@@ -101,4 +101,31 @@ export class TFieldBusModbusRTU extends TFieldBus {
         return appendCRC16toArray(cmdSource);
     }
 
+    public checkInputData(data: Array<any>){
+        //if (getCRC16(Uint8Array.from(data))) throw new Error (`TFieldBus CRC Error`);
+        //if (data[0] != this.FieldBusAddr)    throw new Error (`TFieldBus Device Back Address Error: ${this.FieldBusAddr} expected, but ${data[0]} returned`);
+    }
+
+    //удалить протокольные байты и сделать swap байтов
+    public getRawData(data: Array<any>): Array<any> {
+        const source = Uint8Array.from(data);
+        const count: number = source[2];
+        //const dest = source.subarray(3, source.length-2);
+        const dest = new Uint16Array(count / 2);
+        //теперь swap
+        let dataView = new DataView (source.buffer, 3, count);
+        let destIndex = 0;
+        let sourceIndex = 0;
+        let i = count / 2;
+        while (i--) {
+            let lo = dataView.getUint8(sourceIndex+0);
+            let hi = dataView.getUint8(sourceIndex+1);
+            let reg = (hi << 8 | lo);
+            dest[destIndex] =  reg;
+            destIndex ++;
+            sourceIndex +=2;
+        }
+        console.log(dest);
+        return[]
+    }
 }

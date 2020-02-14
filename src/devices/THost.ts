@@ -33,8 +33,8 @@ export class THost {
 
     public async getSlotData(Slot:TSlot){
         try {
-            let result = await HostController.getSlotDataByID(this.URL, Slot.slotSet.ID);
-            console.log(result);
+            const result = await HostController.getSlotDataByID(this.URL, Slot.slotSet.ID);
+            Slot = Object.assign(Slot, result)
         } catch(e) {
             console.log(e);
             Slot.status = 'Error';

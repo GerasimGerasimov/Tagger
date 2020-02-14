@@ -1,6 +1,7 @@
 import * as utils from '../utils/utils';
 import * as device from './ModelDevice';
 import TTagsSource from './TTagsSource';
+import {TFieldBus} from '../fieldbus/TFieldBus'
 
 const DevicesDir: string = `${utils.ConfDirName}/devices`;//ту хранятся U1, U2 и т.п.
 
@@ -15,6 +16,7 @@ export class TAddressableDevice {
     host: string = '';//имя хоста
     source: string = ''; //название ini-файла
     PositionName: string = ''; //обозначение устройства на схеме
+    FieldBus: TFieldBus;// ссылка на протокол которым обрабатывается устройство
     FieldBusAddr: number = 1;//адрес в сети или полевой шине
     Tags: device.IModelDevice = undefined;//доступные теги, требуется последующее заполнение
     SlotsDescription: Object = {};//описание слотов в JSON-формате, требуется последующая обработка

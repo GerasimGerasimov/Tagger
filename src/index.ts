@@ -8,6 +8,7 @@ import {THosts} from './devices/THosts';
 import {THost} from './devices/THost';
 import TTagsSource from './devices/TTagsSource';
 import {TDevices, TAddressableDevice, TSlotsDataRequest } from './devices/TDevices';
+import { TParameters } from './devices/TagTypes/TParameters'
 const Hosts: THosts = new THosts();
 const TagsSource: TTagsSource = new TTagsSource();
 const Devices: TDevices = new TDevices(TagsSource);
@@ -28,8 +29,7 @@ Hosts.HostsMap.forEach((Host:THost, HostName:string) => {
     console.log(HostName, Host);
     const FieldBus:TFieldBus = new TFieldBusModbusRTU();
     Devices.DevicesMap.forEach ((DeviceProperties: TAddressableDevice, DeviceName: string)=>{
-        //console.log(HostName, Host);
-        //console.log(DeviceName, DeviceProperties);
+        DeviceProperties.FieldBus = FieldBus;//теперь знаю какием протоколом обрабатывается устройство
         FieldBus.Tags  = DeviceProperties.Tags;
         FieldBus.FieldBusAddr = DeviceProperties.FieldBusAddr;
         for (const SlotSourceKey in DeviceProperties.SlotsDescription) {
@@ -54,7 +54,8 @@ Hosts.HostsMap.forEach((Host:THost) => {
 });
 
 //передам СлотСеты реальным хостам используя API /v1/slots/put
-Hosts.sendSlotSetsToHosts();
+(async ()=> {await Hosts.sendSlotSetsToHosts();})();
+
 
 /* TODO (:respond) сделать ответ на запрошенный JSON с параметрами устройства
 {
@@ -93,10 +94,49 @@ const host:THost = Hosts.getHostByName(SlotsDataRequest.Host);
 //по именам слотов
 async function getSlotsData() {
     for (const SlotDataRequest of SlotsDataRequest.SlotDataRequest){
-        const slot: TSlot = host.SlotsMap.get(SlotDataRequest.SlotName);
-        await host.getSlotData(slot)
+        const slot:TSlot = host.SlotsMap.get(SlotDataRequest.SlotName);
+        await host.getSlotData(slot)//обновляю данные хоста
+        const FieldBus: TFieldBus = SlotsDataRequest.AddressableDevice.FieldBus;
+        FieldBus.checkInputData(slot.msg);
+        const RawData: Array<any> = FieldBus.getRawData(slot.msg);
+        console.log(RawData);
+        const Tag: TParameters = SlotsDataRequest.AddressableDevice.Tags[SlotDataRequest.SectionName.toLowerCase()]
+
+        console.log(Tag)
     }
 }
 
-getSlotsData();
+setInterval(()=>{getSlotsData();}, 5000);
+
 console.log('THE END');
+
+        //В идеале, данные хоста теперь обновлены
+        //Slot.status = 'OK'
+        //Slot.msg = '';
+        //Slot.lastUpdateTime = new Date().toISOString();
+        //Slot.slotRAWData = result; - это ответ сырых данных! их ещё надо:
+        //1) обработать в соответствии с протоколом (отловить ошибки CRC, несоотв-я команды, неправильный адрес и т.п)
+        //2) вытащить сырые данные (очищенные от протокола)
+        //3) распределить данные на значения тегов загруженной секции
+        //   если Slot.status = 'Error'; то значения тегов будут undefined
+        //теперь надо из SlotDataRequest.Request сформировать ответ
+        //1) вытаскиваю ссылку на теги секции которую запросил
+        //   SlotsDataRequest.AddressableDevice.Tags[SlotDataRequest.SectionName(cd/flash/ram)]
+        //2) Формирую массив запрошенных тегов
+        //если Request = ALL, то в массив добавляются имена всех тегов запрошенной спекции
+        //если Request = ['Iexc', 'Uexc'] то собственно массив запроса готов 
+        //3) Из SlotsDataRequest.AddressableDevice.Tags[SlotDataRequest.SectionName(cd/flash/ram)]
+        //   вытаскиваю значения rawData + msu для каждого тега из запроса
+        //4) в итоге получаю:
+        /*
+            {
+                status:'OK',
+                message:'всё норм',
+                U1 {
+                    'U1:RAM' {//название слота
+                        Iexc: 100A      //названя и значения параметров
+                        Uexc: undefined //-----------------------------
+                    }
+                }
+            }
+        */

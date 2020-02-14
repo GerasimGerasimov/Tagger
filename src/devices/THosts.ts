@@ -12,10 +12,10 @@ export class THosts {
         let NodesFilesProps = utils.getFilesProps(HostsDir, HostsDirList);
         this.parseNodeList(NodesFilesProps);
     }
-    public sendSlotSetsToHosts(){
-        this.HostsMap.forEach((Host:THost)=>{
-            Host.setSlotSetsToHost();
-        })
+    public async sendSlotSetsToHosts(){
+        for (const Host of this.HostsMap.values()) {
+            await Host.setSlotSetsToHost();
+        }
     }
 
     private parseNodeList(props:Array<utils.IDirСontents>) {
