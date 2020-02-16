@@ -26,6 +26,7 @@ export class TSignal {
     public notAddressable: boolean = false;//true - параметр требуется для расчётов и не входит в адресное пространство устройства
     
     //вычисляемая в зависимости от типа параметра
+    public value: string = '';//значение параметра с ед.измерения
     public rawData: number = 0;//данные объекта
     public option: any = 0;//опции параметра (напр, для TFloat)
     public regNum: number = 0;//номер начального регистра rXXXX
@@ -59,6 +60,10 @@ export class TSignal {
         //получить значение шкалы
         this.scale = vars.getScale(this.scaleStr);
         */
+    }
+
+    public getValueFromInputArray(data:Array<any>){
+
     }
   }
   

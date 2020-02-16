@@ -34,6 +34,9 @@ export class TParameters {
             'TWORD' : () => {return new TU16(ini, this.vars)},
             'TByte' : () => {return new TU8(ini, this.vars)},
             'TInteger' : () => {return new TS16(ini, this.vars)},
+            /*TODO если параметр неизвестен, то всё равно его прочитать
+            как TUnknown из него вытянуть адрес регистра - чтобы не пропускать
+            номера регистров */
             'default': () => {
                 console.log(`${ObjType} not found`)
                 return undefined;

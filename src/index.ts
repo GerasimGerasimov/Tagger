@@ -29,7 +29,7 @@ Hosts.HostsMap.forEach((Host:THost, HostName:string) => {
     console.log(HostName, Host);
     const FieldBus:TFieldBus = new TFieldBusModbusRTU();
     Devices.DevicesMap.forEach ((DeviceProperties: TAddressableDevice, DeviceName: string)=>{
-        DeviceProperties.FieldBus = FieldBus;//теперь знаю какием протоколом обрабатывается устройство
+        DeviceProperties.FieldBus = FieldBus;//теперь знаю каким протоколом обрабатывается устройство
         FieldBus.Tags  = DeviceProperties.Tags;
         FieldBus.FieldBusAddr = DeviceProperties.FieldBusAddr;
         for (const SlotSourceKey in DeviceProperties.SlotsDescription) {

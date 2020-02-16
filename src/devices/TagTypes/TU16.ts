@@ -33,5 +33,8 @@ export class TU16 extends TSignal {
         //получить значение шкалы
         this.scale = vars.getScale(this.scaleStr);
     }
-    
+    //
+    public getValueFromInputArray(data:Array<any>){
+
+    }
 }

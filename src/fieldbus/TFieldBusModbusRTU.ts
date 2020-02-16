@@ -115,11 +115,9 @@ export class TFieldBusModbusRTU extends TFieldBus {
              |________________________aдрес
     */
     public getRawData(data: Array<any>): Array<any> {
-        const count: number = data[2];
         const source = Uint8Array.from(data.slice(3,data.length-2));
         const dest: Uint16Array = this.swapU8ArrayToU16(source)
-        console.log(dest);
-        return[]
+        return Array.from(dest);
     }
 
     private swapU8ArrayToU16(source: Uint8Array): Uint16Array{
