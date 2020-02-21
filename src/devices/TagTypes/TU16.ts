@@ -33,8 +33,12 @@ export class TU16 extends TSignal {
         //получить значение шкалы
         this.scale = vars.getScale(this.scaleStr);
     }
-    //
-    public getValueFromInputArray(data:Array<any>){
 
+    
+    public setDataToParameter(data: Array<any>){
+        this.rawData = data[this.regNum];
+        let value: Number = this.rawData * this.scale;
+        this.value = `${value} ${this.msu}`;
+        if (this.name == 'Iexc') console.log(`Iexc ${this.value}`)
     }
 }

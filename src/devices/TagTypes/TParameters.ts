@@ -20,6 +20,12 @@ export class TParameters {
         return this.ValuesMap;
     }
 
+    public setDataToParameters(data: Array<any>, startRegNumber: number) {
+        this.ValuesMap.forEach((signal: TSignal) => {
+            signal.setDataToParameter(data);
+        });
+    }
+
     private getObjTypeFromIni(ini: string): string {
         const i = ini.indexOf('=');
         const value: Array<string> = ini.slice(i+1).split(/[/]/);// получил массив

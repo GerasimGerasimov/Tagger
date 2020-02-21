@@ -97,16 +97,15 @@ async function getSlotsData() {
         const slot:TSlot = host.SlotsMap.get(SlotDataRequest.SlotName);
         await host.getSlotData(slot)//обновляю данные хоста
         const FieldBus: TFieldBus = SlotsDataRequest.AddressableDevice.FieldBus;
-        FieldBus.checkInputData(slot.msg);
+        FieldBus.checkFolderOfAnswer(slot);
         const RawData: Array<any> = FieldBus.getRawData(slot.msg);
-        console.log(RawData);
+        FieldBus.checkRequiredData(RawData, slot);
         const Tag: TParameters = SlotsDataRequest.AddressableDevice.Tags[SlotDataRequest.SectionName.toLowerCase()]
-
-        console.log(Tag)
+        Tag.setDataToParameters(RawData, slot.slotSet.RegsRange.first);
     }
 }
 
-setInterval(()=>{getSlotsData();}, 5000);
+setInterval(()=>{getSlotsData();}, 500);
 
 console.log('THE END');
 

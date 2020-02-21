@@ -1,5 +1,5 @@
 import * as device from '../devices/ModelDevice'
-import {TSlotSet} from '../slots/TSlotSet'
+import {TSlotSet, TSlot} from '../slots/TSlotSet'
 
 class TTimeOut {
     read:number = 100;
@@ -39,9 +39,12 @@ export abstract class TFieldBus {
         return result;
     }
 
-    public checkInputData(data: Array<any>) {
+    public checkFolderOfAnswer(slot:TSlot) {
     }
 
+    public checkRequiredData(data: Array<any>, slot:TSlot){
+
+    }
     public getRawData(data: Array<any>): Array<any> {
         return[]
     }

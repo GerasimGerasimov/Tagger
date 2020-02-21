@@ -1,14 +1,8 @@
 import {TFieldBus, TSlotSource} from './TFieldBus'
-import {TSlotSet} from '../slots/TSlotSet'
+import {TSlotSet, TSlot, TRegsRange, TCommadType} from '../slots/TSlotSet'
 import {TParameters} from '../devices/TagTypes/TParameters'
 import { TSignal } from '../devices/TagTypes/TSignal';
 import {getCRC16, appendCRC16toArray} from './crc/crc16'
-
-class TRegsRange {
-    min: number = 0;
-    max: number = 0;
-    count: number = 0;
-}
 
 export class TFieldBusModbusRTU extends TFieldBus {
     constructor (){
@@ -27,7 +21,9 @@ export class TFieldBusModbusRTU extends TFieldBus {
                 result.interval = Source.interval;
                 result.NotRespond = Source.NotRespond;
                 result.TimeOut = Source.TimeOut.read;
-                result.ID = `${PositionName}:${Source.section}`
+                result.ID = `${PositionName}:${Source.section}`;
+                result.RegsRange = range;
+                result.commandType = TCommadType.ReadMultiplayRegisters;
                 return result;
             }
         }
@@ -62,11 +58,11 @@ export class TFieldBusModbusRTU extends TFieldBus {
             const tagMin:TSignal = regs[0];//параметр с минимальным регистром
             const tagMax:TSignal = regs[regs.length-1];//параметр с максимальым регистром
             //tagMax может скоректироваться на 1 регистр, так как переменная может занимать 2 регистра
-            const min: number = tagMin.regNum;
-            const max: number = tagMax.regNum + Number((tagMax.bytes === 4)? 1: 0);
-            var   count: number = max - min;
+            const first: number = tagMin.regNum;
+            const last: number = tagMax.regNum + Number((tagMax.bytes === 4)? 1: 0);
+            var   count: number = last - first;
             if (count === 0) count++; //не может быть ноль регистров в запросе
-            const result: TRegsRange = {min, max, count};
+            const result: TRegsRange = {first, last, count};
             return result;
         }
         return undefined;
@@ -96,16 +92,38 @@ export class TFieldBusModbusRTU extends TFieldBus {
     private createReadCommand(range: TRegsRange): Uint8Array {
         const FieldBusAddr: number = this.FieldBusAddr;
         const cmdSource = new Uint8Array([FieldBusAddr, 0x03,
-                                    range.min >> 8, range.min & 0xFF,
+                                    range.first >> 8, range.first & 0xFF,
                                     range.count >> 8, range.count & 0xFF]);
         return appendCRC16toArray(cmdSource);
     }
 
-    public checkInputData(data: Array<any>){
-        //if (getCRC16(Uint8Array.from(data))) throw new Error (`TFieldBus CRC Error`);
-        //if (data[0] != this.FieldBusAddr)    throw new Error (`TFieldBus Device Back Address Error: ${this.FieldBusAddr} expected, but ${data[0]} returned`);
+    public checkFolderOfAnswer(slot: TSlot){
+        //контрольная сумма
+        if (getCRC16(Uint8Array.from(slot.msg))) throw new Error (`TFieldBus CRC Error`);
+        //соответствие адреса
+        if (slot.msg[0] != this.FieldBusAddr)    throw new Error (`TFieldBus Device Back Address Error: ${this.FieldBusAddr} expected, but ${slot.msg[0]} returned`);
+        // TODO добавить выявление кода ошибки в поле команды (старший бит)
+        if (slot.msg[1] & 0x80) throw new Error (`TFieldBus Bus Command Error`);
     }
 
+    public checkRequiredData(data: Array<any>, slot:TSlot){
+        switch (slot.slotSet.commandType) {
+            case TCommadType.ReadMultiplayRegisters: 
+                this.checkCmdReadMultiplayRegisters(data ,slot);
+            break;
+            default:
+                throw new Error ('TFieldBus Unknown command')
+            break;
+        }
+    }
+
+    private checkCmdReadMultiplayRegisters(data: Array<any>, slot: TSlot) {
+        //кол-во запрошенных данных должно совпадать с теми что пришли от устройства
+        const requiredRegsNum = slot.slotSet.RegsRange.count;
+        const inputRegNum = data.length;
+        if (requiredRegsNum != inputRegNum) 
+            (`TFieldBus Device Regs Numbers Error: ${requiredRegsNum} regs expected, but ${inputRegNum} returned`);
+    }
     /*удалить протокольные байты и сделать swap байтов
     формат: AD,C,BCNT,DATA[swapped u16],CRC(h,l)
              │ │  │       │              └─ (word)crc16

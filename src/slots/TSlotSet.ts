@@ -12,4 +12,17 @@ export class TSlotSet {
     interval?: number = 0; //частота активации слота в милисекундах
     NotRespond: boolean = false;//true - команда в out не требует ответа на неё
     TimeOut: number = 100;//время ожидания ответа устройства
+    RegsRange:TRegsRange = undefined;
+    commandType: TCommadType;
+}
+
+export const enum TCommadType {
+    ReadMultiplayRegisters,
+    WriteMultiplayRegisters
+}
+
+export class TRegsRange {
+    first: number = 0;
+    last: number = 0;
+    count: number = 0;//кол-во регистров для чтения
 }

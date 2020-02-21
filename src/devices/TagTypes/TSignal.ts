@@ -62,7 +62,7 @@ export class TSignal {
         */
     }
 
-    public getValueFromInputArray(data:Array<any>){
+    public setDataToParameter(data: Array<any>){
 
     }
   }

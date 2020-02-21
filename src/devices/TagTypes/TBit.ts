@@ -19,4 +19,9 @@ export class TBit extends TSignal {
         this.mask   =  parseInt(reg[1],16);           
     }
     
+    public setDataToParameter(data: Array<any>){
+        this.rawData = data[this.regNum] & ( 1 << this.mask);
+        let value: Number = (this.rawData != 0)? 1 : 0;
+        this.value = `${value}`;
+    }
 }
