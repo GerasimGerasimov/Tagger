@@ -93,6 +93,7 @@ const host:THost = Hosts.getHostByName(SlotsDataRequest.Host);
 //теперь есть Host и имена слотов, можно обращаться к Хосту за данными
 //по именам слотов
 async function getSlotsData() {
+    const result: any = {[`${SlotsDataRequest.PositionName}`]:{}};
     for (const SlotDataRequest of SlotsDataRequest.SlotDataRequest){
         const slot:TSlot = host.SlotsMap.get(SlotDataRequest.SlotName);
         await host.getSlotData(slot)//обновляю данные хоста
@@ -102,10 +103,20 @@ async function getSlotsData() {
         FieldBus.checkRequiredData(RawData, slot);
         const Tag: TParameters = SlotsDataRequest.AddressableDevice.Tags[SlotDataRequest.SectionName.toLowerCase()]
         Tag.setDataToParameters(RawData, slot.slotSet.RegsRange.first);
+        const request = SlotDataRequest.Request;
+        if (!Array.isArray(request)) {
+            if (request == 'ALL') {
+                /*TODO тогда request = массиву названий всех переменных
+                    доступных для этой SectionName
+                */
+            }
+        } else {
+            // TODO кривой запрос
+        }
     }
 }
 
-setInterval(()=>{getSlotsData();}, 500);
+setInterval(()=>{getSlotsData();}, 100);
 
 console.log('THE END');
 

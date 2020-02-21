@@ -54,7 +54,6 @@ export class TParameters {
     private parseListToMap(ParametersList: Array<string>) {
         ParametersList.forEach((item: string) => { 
             if (item[0] !== ';') {//если не комментарий
-                //console.log(item);
                 let signal = this.factory(item);// получаю объект параметра
                 if (signal !== undefined) {//и если он создался
                     let key: string = signal.name;//до добавляю в карту
