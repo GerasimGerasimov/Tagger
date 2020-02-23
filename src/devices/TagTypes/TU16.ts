@@ -35,10 +35,9 @@ export class TU16 extends TSignal {
     }
 
     
-    public setDataToParameter(data: Array<any>){
-        this.rawData = data[this.regNum];
+    public setDataToParameter(data: Map<number, any>){
+        this.rawData = data.get(this.regNum);
         let value: Number = this.rawData * this.scale;
         this.value = `${value} ${this.msu}`;
-        if (this.name == 'Iexc') console.log(`Iexc ${this.value}`)
     }
 }

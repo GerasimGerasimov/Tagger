@@ -9,6 +9,7 @@ import {THost} from './devices/THost';
 import TTagsSource from './devices/TTagsSource';
 import {TDevices, TAddressableDevice, TSlotsDataRequest } from './devices/TDevices';
 import { TParameters } from './devices/TagTypes/TParameters'
+import { IErrorMessage } from './utils/types';
 const Hosts: THosts = new THosts();
 const TagsSource: TTagsSource = new TTagsSource();
 const Devices: TDevices = new TDevices(TagsSource);
@@ -92,34 +93,31 @@ const host:THost = Hosts.getHostByName(SlotsDataRequest.Host);
 
 //теперь есть Host и имена слотов, можно обращаться к Хосту за данными
 //по именам слотов
-async function getSlotsData() {
+var counter: number = 0;
+const start = new Date().getTime();
+var stop = new Date().getTime(); 
+async function getSlotsData()/*: Promise<Object | IErrorMessage>*/{
+    const FieldBus: TFieldBus = SlotsDataRequest.AddressableDevice.FieldBus;
     const PositionName = SlotsDataRequest.PositionName;
-    const result: any = {[PositionName]:{}};
+    const result: Object = {[PositionName]:{}};
     for (const SlotDataRequest of SlotsDataRequest.SlotDataRequest){
         const slot:TSlot = host.SlotsMap.get(SlotDataRequest.SlotName);
         await host.getSlotData(slot)//обновляю данные хоста
-        const FieldBus: TFieldBus = SlotsDataRequest.AddressableDevice.FieldBus;
         FieldBus.checkFolderOfAnswer(slot);
         const RawData: Array<any> = FieldBus.getRawData(slot.msg);
         FieldBus.checkRequiredData(RawData, slot);
         const Tag: TParameters = SlotsDataRequest.AddressableDevice.Tags[SlotDataRequest.SectionName.toLowerCase()]
-        Tag.setDataToParameters(RawData, slot.slotSet.RegsRange.first);
-        var request = SlotDataRequest.Request;
-        if (!Array.isArray(request)) {
-            if (request == 'ALL') {
-                request = Tag.getParametersNames();
-            }
-        } else {
-            // TODO кривой запрос
-        }
-        //нормальный или исправленный ALL-запрос
-        const Values = Tag.getValuesOfParameters(request);
+        const RawDataMap: Map<number, any> = FieldBus.convertRawDataToMap(RawData, slot.slotSet.RegsRange.first);
+        Tag.setDataToParameters(RawDataMap);
+        const Values: Object = Tag.getRequiredParameters(SlotDataRequest.Request);
         result[PositionName][SlotDataRequest.SlotName] = Values;
     }
-    //console.log(result);
+    stop = new Date().getTime(); 
+    console.log(`${counter++}:${(stop-start)/1000}`);
+    //return result;
 }
 
-setInterval(()=>{getSlotsData();}, 100);
+setInterval(()=>{getSlotsData();}, 1);
 
 console.log('THE END');
 

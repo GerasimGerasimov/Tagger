@@ -48,4 +48,8 @@ export abstract class TFieldBus {
     public getRawData(data: Array<any>): Array<any> {
         return[]
     }
+
+    public convertRawDataToMap(RawData: Array<any>, firstReg: number): Map<number, any> {
+        return new Map(RawData);
+    }
 }

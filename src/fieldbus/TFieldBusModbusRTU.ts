@@ -117,6 +117,14 @@ export class TFieldBusModbusRTU extends TFieldBus {
         }
     }
 
+    public convertRawDataToMap(RawData: Array<any>, firstReg: number): Map<number, any> {
+        const result: Map<number, any> = new Map<number, any>();
+        RawData.forEach((item: any, index: number)=>{
+            result.set(firstReg+index, item);
+        });
+        return result;
+    }
+
     private checkCmdReadMultiplayRegisters(data: Array<any>, slot: TSlot) {
         //кол-во запрошенных данных должно совпадать с теми что пришли от устройства
         const requiredRegsNum = slot.slotSet.RegsRange.count;

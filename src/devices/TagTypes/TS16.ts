@@ -21,7 +21,14 @@ export class TS16 extends TSignal {
         this.msu = this.ini[5];
         this.bytes  = 2;//всегда читает 16 бит регистр
         this.scaleStr= this.ini[6];
-        this.signOffset=parseInt(this.ini[8].slice(1,5),16);
+        //сначала попробую преобразовать число с основанием 10
+        let signOffset: number = parseInt(this.ini[8]);
+        if (isNaN(signOffset)) {//не DEC! пробую HEX
+            signOffset = parseInt(this.ini[8].slice(1,5),16);
+            if (isNaN(signOffset))
+                signOffset = 0;
+        } 
+        this.signOffset = signOffset;
         //9 и 10 - опции и надо ориентироваться по кол-ву строк
         if (this.ini.length === 12) {
             this.depend  = this.ini[9];
@@ -36,5 +43,10 @@ export class TS16 extends TSignal {
         //получить значение шкалы
         this.scale = vars.getScale(this.scaleStr);
     }
-    
+
+    public setDataToParameter(data: Map<number, any>){
+        this.rawData = data.get(this.regNum);
+        let value: Number = (this.rawData - this.signOffset) * this.scale;
+        this.value = `${value} ${this.msu}`;
+    }
 }

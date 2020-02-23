@@ -20,7 +20,7 @@ export class TParameters {
         return this.ValuesMap;
     }
 
-    public setDataToParameters(data: Array<any>, startRegNumber: number) {
+    public setDataToParameters(data: Map<number, any>) {
         this.ValuesMap.forEach((signal: TSignal) => {
             signal.setDataToParameter(data);
         });
@@ -32,6 +32,18 @@ export class TParameters {
             result[item] = this.getValueOfParameter(item);
         });  
         return result;      
+    }
+
+    public getRequiredParameters(request: Array<string>): Object{
+        if (!Array.isArray(request)) {
+            if (request == 'ALL') {
+                request = this.getParametersNames();
+            }
+        } else {
+            // TODO кривой запрос
+        }
+        //нормальный или исправленный ALL-запрос
+        return this.getValuesOfParameters(request);
     }
 
     public getParametersNames():Array<string> {
