@@ -26,6 +26,29 @@ export class TParameters {
         });
     }
 
+    public getValuesOfParameters(request: Array<string>): Object {
+        const result = {};
+        request.forEach((item: string)=>{
+            result[item] = this.getValueOfParameter(item);
+        });  
+        return result;      
+    }
+
+    public getParametersNames():Array<string> {
+        const result = [];
+        for(let key of this.ValuesMap.keys()) {
+            result.push(key);
+          }
+        return result;
+    }
+
+    private getValueOfParameter(name:string): any {
+        /*TODO если праметра нет или не создался, или не обрабатывается
+        должен получать значение undefined и без единиц измерения */
+        const signal: TSignal = this.ValuesMap.get(name);
+        return signal.value;
+    }
+
     private getObjTypeFromIni(ini: string): string {
         const i = ini.indexOf('=');
         const value: Array<string> = ini.slice(i+1).split(/[/]/);// получил массив

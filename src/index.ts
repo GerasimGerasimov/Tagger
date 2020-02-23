@@ -80,7 +80,7 @@ Hosts.HostsMap.forEach((Host:THost) => {
 
 const U1_request = {
     U1:{
-        'RAM':['Iexc', 'Uexc'],
+        'RAM':['Iexc', 'Uexc','Ustat'],
         'FLASH':'ALL',
     }
 }
@@ -93,7 +93,8 @@ const host:THost = Hosts.getHostByName(SlotsDataRequest.Host);
 //теперь есть Host и имена слотов, можно обращаться к Хосту за данными
 //по именам слотов
 async function getSlotsData() {
-    const result: any = {[`${SlotsDataRequest.PositionName}`]:{}};
+    const PositionName = SlotsDataRequest.PositionName;
+    const result: any = {[PositionName]:{}};
     for (const SlotDataRequest of SlotsDataRequest.SlotDataRequest){
         const slot:TSlot = host.SlotsMap.get(SlotDataRequest.SlotName);
         await host.getSlotData(slot)//обновляю данные хоста
@@ -103,17 +104,19 @@ async function getSlotsData() {
         FieldBus.checkRequiredData(RawData, slot);
         const Tag: TParameters = SlotsDataRequest.AddressableDevice.Tags[SlotDataRequest.SectionName.toLowerCase()]
         Tag.setDataToParameters(RawData, slot.slotSet.RegsRange.first);
-        const request = SlotDataRequest.Request;
+        var request = SlotDataRequest.Request;
         if (!Array.isArray(request)) {
             if (request == 'ALL') {
-                /*TODO тогда request = массиву названий всех переменных
-                    доступных для этой SectionName
-                */
+                request = Tag.getParametersNames();
             }
         } else {
             // TODO кривой запрос
         }
+        //нормальный или исправленный ALL-запрос
+        const Values = Tag.getValuesOfParameters(request);
+        result[PositionName][SlotDataRequest.SlotName] = Values;
     }
+    //console.log(result);
 }
 
 setInterval(()=>{getSlotsData();}, 100);
