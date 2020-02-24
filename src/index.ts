@@ -9,7 +9,9 @@ import {THost} from './devices/THost';
 import TTagsSource from './devices/TTagsSource';
 import {TDevices, TAddressableDevice, TSlotsDataRequest } from './devices/TDevices';
 import { TParameters } from './devices/TagTypes/TParameters'
-import { IErrorMessage } from './utils/types';
+
+import {AppServer, IServer} from "./server/server"
+
 const Hosts: THosts = new THosts();
 const TagsSource: TTagsSource = new TTagsSource();
 const Devices: TDevices = new TDevices(TagsSource);
@@ -57,46 +59,7 @@ Hosts.HostsMap.forEach((Host:THost) => {
 //передам СлотСеты реальным хостам используя API /v1/slots/put
 (async ()=> {await Hosts.sendSlotSetsToHosts();})();
 
-
-/* TODO (:respond) сделать ответ на запрошенный JSON с параметрами устройства
-{
-    U1:{
-        RAM:{//название слота
-            ALL или [Iexc, Uexc]
-        }
-    }
-}
-А в ответ:
-    {
-        status:'OK',
-        message:'всё норм',
-        U1 {
-            'U1:RAM' {//название слота
-                Iexc: 100A      //названя и значения параметров
-                Uexc: undefined //-----------------------------
-            }
-        }
-    }
-*/
-
-const U1_request = {
-    U1:{
-        'RAM':['Iexc', 'Uexc','Ustat'],
-        'FLASH':'ALL',
-    }
-}
-
-//В AddressableDevice находится ссылка на host и
-// tags в которых есть RAM, FLASH и т.п.
-const SlotsDataRequest :TSlotsDataRequest  = Devices.getSlotsDataRequest(U1_request);
-const host:THost = Hosts.getHostByName(SlotsDataRequest.Host);
-
-//теперь есть Host и имена слотов, можно обращаться к Хосту за данными
-//по именам слотов
-var counter: number = 0;
-const start = new Date().getTime();
-var stop = new Date().getTime(); 
-async function getSlotsData()/*: Promise<Object | IErrorMessage>*/{
+async function getSlotsData(request: Object, SlotsDataRequest :TSlotsDataRequest, host:THost): Promise<any>{
     const FieldBus: TFieldBus = SlotsDataRequest.AddressableDevice.FieldBus;
     const PositionName = SlotsDataRequest.PositionName;
     const result: Object = {[PositionName]:{}};
@@ -112,42 +75,26 @@ async function getSlotsData()/*: Promise<Object | IErrorMessage>*/{
         const Values: Object = Tag.getRequiredParameters(SlotDataRequest.Request);
         result[PositionName][SlotDataRequest.SlotName] = Values;
     }
-    stop = new Date().getTime(); 
-    console.log(`${counter++}:${(stop-start)/1000}`);
-    //return result;
+    return result;
 }
 
-setInterval(()=>{getSlotsData();}, 1);
+async function getgetDeviceData(request: Object): Promise<any> {
+    const SlotsDataRequest :TSlotsDataRequest  = Devices.getSlotsDataRequest(request);
+    const host:THost = Hosts.getHostByName(SlotsDataRequest.Host);
+    const result: any = await getSlotsData(request, SlotsDataRequest, host);
+    return result;
+}
 
-console.log('THE END');
+/*
+const U1_request = {
+    U1:{
+        'RAM':['Iexc', 'Uexc','Ustat'],
+        'FLASH':'ALL',
+    }
+}
+*/
+//setInterval(()=>{getgetDeviceData(U1_request);}, 1000);
 
-        //В идеале, данные хоста теперь обновлены
-        //Slot.status = 'OK'
-        //Slot.msg = '';
-        //Slot.lastUpdateTime = new Date().toISOString();
-        //Slot.slotRAWData = result; - это ответ сырых данных! их ещё надо:
-        //1) обработать в соответствии с протоколом (отловить ошибки CRC, несоотв-я команды, неправильный адрес и т.п)
-        //2) вытащить сырые данные (очищенные от протокола)
-        //3) распределить данные на значения тегов загруженной секции
-        //   если Slot.status = 'Error'; то значения тегов будут undefined
-        //теперь надо из SlotDataRequest.Request сформировать ответ
-        //1) вытаскиваю ссылку на теги секции которую запросил
-        //   SlotsDataRequest.AddressableDevice.Tags[SlotDataRequest.SectionName(cd/flash/ram)]
-        //2) Формирую массив запрошенных тегов
-        //если Request = ALL, то в массив добавляются имена всех тегов запрошенной спекции
-        //если Request = ['Iexc', 'Uexc'] то собственно массив запроса готов 
-        //3) Из SlotsDataRequest.AddressableDevice.Tags[SlotDataRequest.SectionName(cd/flash/ram)]
-        //   вытаскиваю значения rawData + msu для каждого тега из запроса
-        //4) в итоге получаю:
-        /*
-            {
-                status:'OK',
-                message:'всё норм',
-                U1 {
-                    'U1:RAM' {//название слота
-                        Iexc: 100A      //названя и значения параметров
-                        Uexc: undefined //-----------------------------
-                    }
-                }
-            }
-        */
+const Server: IServer = new AppServer(5004, getgetDeviceData);
+console.log('Tagger Service started');
+Server.serve();
