@@ -65,15 +65,26 @@ async function getSlotsData(request: Object, SlotsDataRequest :TSlotsDataRequest
     const result: Object = {[PositionName]:{}};
     for (const SlotDataRequest of SlotsDataRequest.SlotDataRequest){
         const slot:TSlot = host.SlotsMap.get(SlotDataRequest.SlotName);
-        await host.getSlotData(slot)//обновляю данные хоста
-        FieldBus.checkFolderOfAnswer(slot);
-        const RawData: Array<any> = FieldBus.getRawData(slot.msg);
-        FieldBus.checkRequiredData(RawData, slot);
-        const Tag: TParameters = SlotsDataRequest.AddressableDevice.Tags[SlotDataRequest.SectionName.toLowerCase()]
-        const RawDataMap: Map<number, any> = FieldBus.convertRawDataToMap(RawData, slot.slotSet.RegsRange.first);
-        Tag.setDataToParameters(RawDataMap);
-        const Values: Object = Tag.getRequiredParameters(SlotDataRequest.Request);
-        result[PositionName][SlotDataRequest.SlotName] = Values;
+        try {
+            await host.getSlotData(slot)//обновляю данные хоста
+            FieldBus.checkFolderOfAnswer(slot);
+            const RawData: Array<any> = FieldBus.getRawData(slot.msg);
+            FieldBus.checkRequiredData(RawData, slot);
+            const Tag: TParameters = SlotsDataRequest.AddressableDevice.Tags[SlotDataRequest.SectionName.toLowerCase()]
+            const RawDataMap: Map<number, any> = FieldBus.convertRawDataToMap(RawData, slot.slotSet.RegsRange.first);
+            Tag.setDataToParameters(RawDataMap);
+            const Values: Object = Tag.getRequiredParameters(SlotDataRequest.Request);
+            result[PositionName][SlotDataRequest.SlotName] = {
+                'status':'OK',
+                'data':Values
+            }
+        } catch (e) {
+            result[PositionName][SlotDataRequest.SlotName] = {
+                'status':'Error',
+                'msg': e.message
+            };
+        }
+        
     }
     return result;
 }
