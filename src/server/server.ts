@@ -26,6 +26,7 @@ export class AppServer implements IServer{
             res.header("Access-Control-Allow-Origin", "*");
             res.header("Access-Control-Allow-Headers", "X-Requested-With");
             res.header('Access-Control-Allow-Headers', 'Content-Type');
+            res.setHeader('Access-Control-Allow-Headers', 'origin, content-type, accept');
             next();
         });
     }

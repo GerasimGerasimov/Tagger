@@ -98,6 +98,7 @@ export class TFieldBusModbusRTU extends TFieldBus {
     }
 
     public checkFolderOfAnswer(slot: TSlot){
+        if (slot.status == 'Error') throw new Error(slot.msg)
         //контрольная сумма
         if (getCRC16(Uint8Array.from(slot.msg))) throw new Error (`TFieldBus CRC Error`);
         //соответствие адреса
