@@ -34,7 +34,7 @@ export class TFieldBusModbusRTU extends TFieldBus {
         //доступный диапазон регистров в Tags
         const AvailableRegsRange: TRegsRange = this.getAvailableRegsRangeOfTags(tags);
         //требуемый диапазон регистров в слоте
-        const RequireRegsRang: TRegsRange = this.getRequireRegsRange(range, AvailableRegsRange);
+        const RequireRegsRang: TRegsRange = this.getRequireRegsRange(tags, range, AvailableRegsRange);
         return RequireRegsRang;  
         // TODO (:range): соотнести требуемый диапазон с допустимым
     }
@@ -75,12 +75,39 @@ export class TFieldBusModbusRTU extends TFieldBus {
                    | range = {from:"r0000", to:"r004E"}   номера регистров от и до
                    | range = {DExS_PWR_LNK, dVQref, Qoe}  перечислены имена параметров
     */
-    private getRequireRegsRange (range: any, AvailableRegsRange: TRegsRange) : TRegsRange{
-        if (range === "all") return AvailableRegsRange;
+    private getRequireRegsRange (tags: TParameters, range: any, AvailableRegsRange: TRegsRange) : TRegsRange{
+        if (!Array.isArray(range)) {
+            if (range === "all") {
+                return AvailableRegsRange;
+            }        
+        } else {
+            return this.getRangeFromRequiredParametersList(tags, range);
+        }
         throw new Error(`getRequireRegsRange : range ${range} is not available`)
-        // TODO (:range): добавить from ... to
     }
 
+    private getRangeFromRequiredParametersList(tags: TParameters, parameters: Array<string>): TRegsRange {
+         const regs: Array<number> = parameters.map((item) => {
+            const signal:TSignal = tags.valuesMap.get(item);
+            //учесть размер регистра в байтах
+            const valueSize =  signal.bytes % 2;
+            return signal.regNum + valueSize;
+        });
+        regs.sort((a, b) => {
+            if (a < b) return -1;
+            if (a > b) return  1;
+            return 0;
+        });       
+        if (regs.length !== 0) {
+            const first: number = regs[0];
+            const last: number = regs[regs.length-1]
+            var   count: number = (last - first)+1;
+            if (count === 0) count++; //не может быть ноль регистров в запросе
+            const result: TRegsRange = {first, last, count};
+            return result;
+        }
+        return undefined;
+    } 
     /* Сборка команды чтения нескольких регистров
     формат: AD,C,R(h,l),Cnt(h,l),CRC(h,l)
              │ │  │       │        └─ (word)crc16

@@ -5,7 +5,7 @@
     "slots":{
         "U1:RAM": {
             "section":"RAM",
-            "range":"all",
+            "range":["MCDT","Ustat","Uexc"],
             "TimeOut": {
                 "read": 100,
                 "write": 100
@@ -21,7 +21,7 @@
                 "write": 100
             },
             "NotRespond": false,
-            "interval":0
+            "interval":1000
         }
     }
 }

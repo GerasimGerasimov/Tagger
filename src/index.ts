@@ -39,7 +39,6 @@ Hosts.HostsMap.forEach((Host:THost, HostName:string) => {
             try {
                 const SlotSourceValue: TSlotSource = DeviceProperties.SlotsDescription[SlotSourceKey];
                 const SlotSet:TSlotSet = FieldBus.createReadSlot(DeviceProperties.PositionName, SlotSourceValue);
-                console.log(SlotSet)
                 Host.addSlotSetToMap(SlotSet);
             } catch (e) {
                 console.log(e)
@@ -48,6 +47,7 @@ Hosts.HostsMap.forEach((Host:THost, HostName:string) => {
     });
 });
 
+/*
 //выведу список Хостов и связанных с ними Слотов
 Hosts.HostsMap.forEach((Host:THost) => {
     console.log(Host.Name);
@@ -55,7 +55,7 @@ Hosts.HostsMap.forEach((Host:THost) => {
         console.log(item)
     });
 });
-
+*/
 //передам СлотСеты реальным хостам используя API /v1/slots/put
 (async ()=> {await Hosts.sendSlotSetsToHosts();})();
 
@@ -99,7 +99,7 @@ async function getgetDeviceData(request: Object): Promise<any> {
 /*
 const U1_request = {
     U1:{
-        'RAM':['Iexc', 'Uexc','Ustat'],
+        'RAM':['MCDT','Iexc', 'Uexc','Ustat'],
         'FLASH':'ALL',
     }
 }

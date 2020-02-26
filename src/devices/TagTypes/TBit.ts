@@ -20,7 +20,12 @@ export class TBit extends TSignal {
     }
     
     public setDataToParameter(data: Map<number, any>){
-        this.rawData = data.get(this.regNum) & ( 1 << this.mask);
+        let rawData = data.get(this.regNum);
+        if (rawData === undefined) {
+            this.value = null;
+            return;
+        }
+        this.rawData = rawData & ( 1 << this.mask);
         let value: Number = (this.rawData != 0)? 1 : 0;
         this.value = `${value}`;
     }

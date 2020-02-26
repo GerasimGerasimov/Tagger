@@ -45,11 +45,15 @@ export class TS16 extends TSignal {
     }
 
     public setDataToParameter(data: Map<number, any>){
-        let s16 = data.get(this.regNum);
+        let rawData = data.get(this.regNum);
+        if (rawData === undefined) {
+            this.value = null;
+            return;
+        }
         //это 16бит знаковое число, в старшем бите знак.
-        this.rawData =  (s16 & 0x8000)
-                        ? s16 - 0x10000
-                        : s16;
+        this.rawData =  (rawData & 0x8000)
+                        ? rawData - 0x10000
+                        : rawData;
         let value: Number = (this.rawData - this.signOffset) * this.scale;
         this.value = `${value} ${this.msu}`;
     }

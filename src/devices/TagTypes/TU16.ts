@@ -36,7 +36,12 @@ export class TU16 extends TSignal {
 
     
     public setDataToParameter(data: Map<number, any>){
-        this.rawData = data.get(this.regNum);
+        let rawData = data.get(this.regNum);
+        if (rawData === undefined) {
+            this.value = null;
+            return;
+        }
+        this.rawData = rawData;
         let value: Number = this.rawData * this.scale;
         this.value = `${value} ${this.msu}`;
     }
