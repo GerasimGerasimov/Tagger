@@ -1,3 +1,10 @@
+export class TDeviceAnswer {
+    status: string;
+    duration:number;
+    time:any;
+    data:Object;
+}
+
 export class TSlot {
     status: string = ''
     msg: any;

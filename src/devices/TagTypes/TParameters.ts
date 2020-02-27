@@ -5,6 +5,7 @@ import { TBit } from './TBit';
 import { TU16 } from './TU16';
 import { TU8 } from './TU8';
 import { TS16 } from './TS16';
+import { TF32 } from './TF32';
  
 export class TParameters {
     private vars:TVars;
@@ -75,6 +76,7 @@ export class TParameters {
             'TWORD' : () => {return new TU16(ini, this.vars)},
             'TByte' : () => {return new TU8(ini, this.vars)},
             'TInteger' : () => {return new TS16(ini, this.vars)},
+            'TFloat'   : () => {return new TF32(ini, this.vars)},
             /*TODO если параметр неизвестен, то всё равно его прочитать
             как TUnknown из него вытянуть адрес регистра - чтобы не пропускать
             номера регистров */

@@ -86,20 +86,26 @@ export class TFieldBusModbusRTU extends TFieldBus {
     }
 
     private getRangeFromRequiredParametersList(tags: TParameters, parameters: Array<string>): TRegsRange {
-         const regs: Array<number> = parameters.map((item) => {
+         const regs: Array<any> = parameters.map((item) => {
             const signal:TSignal = tags.valuesMap.get(item);
             //учесть размер регистра в байтах
-            const valueSize =  signal.bytes % 2;
-            return signal.regNum + valueSize;
+            let valueSize = 0;
+            switch (signal.bytes) {
+                case 1:
+                case 2: valueSize = 0;
+                        break;
+                case 4: valueSize = 1;
+            }
+            return {regNum: signal.regNum, size: valueSize};
         });
         regs.sort((a, b) => {
-            if (a < b) return -1;
-            if (a > b) return  1;
+            if (a.regNum < b.regNum) return -1;
+            if (a.regNum > b.regNum) return  1;
             return 0;
-        });       
+        });    
         if (regs.length !== 0) {
-            const first: number = regs[0];
-            const last: number = regs[regs.length-1]
+            const first: number = regs[0].regNum;
+            const last: number = regs[regs.length-1].regNum + regs[regs.length-1].size;
             var   count: number = (last - first)+1;
             const result: TRegsRange = {first, last, count};
             return result;
