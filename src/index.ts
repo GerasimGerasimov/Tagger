@@ -59,6 +59,12 @@ Hosts.HostsMap.forEach((Host:THost) => {
 //передам СлотСеты реальным хостам используя API /v1/slots/put
 (async ()=> {await Hosts.sendSlotSetsToHosts();})();
 
+class TDeviceAnswer {
+    status: string;
+    duration:number;
+    time:any;
+    data:Object;
+}
 async function getSlotsData(request: Object, SlotsDataRequest :TSlotsDataRequest, host:THost): Promise<any>{
     const FieldBus: TFieldBus = SlotsDataRequest.AddressableDevice.FieldBus;
     const PositionName = SlotsDataRequest.PositionName;
@@ -73,11 +79,14 @@ async function getSlotsData(request: Object, SlotsDataRequest :TSlotsDataRequest
             const Tag: TParameters = SlotsDataRequest.AddressableDevice.Tags[SlotDataRequest.SectionName.toLowerCase()]
             const RawDataMap: Map<number, any> = FieldBus.convertRawDataToMap(RawData, slot.slotSet.RegsRange.first);
             Tag.setDataToParameters(RawDataMap);
-            const Values: Object = Tag.getRequiredParameters(SlotDataRequest.Request);
-            result[PositionName][SlotDataRequest.SlotName] = {
-                'status':'OK',
-                'data':Values
+            const data: Object = Tag.getRequiredParameters(SlotDataRequest.Request);
+            const DeviceAnswer: TDeviceAnswer = {
+                status:'OK',
+                duration:slot.duration,
+                time:slot.time || null,
+                data,
             }
+            result[PositionName][SlotDataRequest.SlotName] = DeviceAnswer;
         } catch (e) {
             result[PositionName][SlotDataRequest.SlotName] = {
                 'status':'Error',

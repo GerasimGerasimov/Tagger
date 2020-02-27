@@ -60,8 +60,7 @@ export class TFieldBusModbusRTU extends TFieldBus {
             //tagMax может скоректироваться на 1 регистр, так как переменная может занимать 2 регистра
             const first: number = tagMin.regNum;
             const last: number = tagMax.regNum + Number((tagMax.bytes === 4)? 1: 0);
-            var   count: number = last - first;
-            if (count === 0) count++; //не может быть ноль регистров в запросе
+            var   count: number = (last - first)+1;
             const result: TRegsRange = {first, last, count};
             return result;
         }
@@ -102,7 +101,6 @@ export class TFieldBusModbusRTU extends TFieldBus {
             const first: number = regs[0];
             const last: number = regs[regs.length-1]
             var   count: number = (last - first)+1;
-            if (count === 0) count++; //не может быть ноль регистров в запросе
             const result: TRegsRange = {first, last, count};
             return result;
         }
