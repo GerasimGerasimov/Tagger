@@ -16,7 +16,6 @@ const TagsSource: TTagsSource = new TTagsSource();
 const Devices: TDevices = new TDevices(TagsSource);
 
 Hosts.HostsMap.forEach((Host:THost, HostName:string) => {
-    console.log(HostName, Host);
     const FieldBus:TFieldBus = new TFieldBusModbusRTU();
     Devices.DevicesMap.forEach ((DeviceProperties: TAddressableDevice, DeviceName: string)=>{
         DeviceProperties.FieldBus = FieldBus;//теперь знаю каким протоколом обрабатывается устройство

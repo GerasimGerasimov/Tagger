@@ -13,7 +13,6 @@ export class TFieldBusModbusRTU extends TFieldBus {
         let range: TRegsRange = undefined;
         let tags: TParameters = this.Tags[Source.section.toLowerCase()];
         if (tags !== undefined) {
-            console.log(Source, tags);
             range = this.getRegsRange(Source.range, tags);
             if (range !== undefined) {
                 const result = new TSlotSet();

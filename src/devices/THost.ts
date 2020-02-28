@@ -20,7 +20,6 @@ export class THost {
         for (const Slot of this.SlotsMap.values()) {
             try {
                 let result = await HostController.putSlotSetToHost(this.URL, Slot.slotSet);
-                console.log(result);
                 Slot.status = 'SlotSet added';
                 Slot.msg = '';
             } catch (e) {

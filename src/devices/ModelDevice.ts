@@ -52,24 +52,14 @@ export function getDevicesTags(DevicesFilesProps:Array<utils.IDirСontents>): Ar
 
 export function getDeviceFromFile(name: string, content: any): IModelDevice {
   content = ini.loadLinesFromBuffer(content);
-  console.log(content);
   //ID
   const IDList: Array<string> = ini.getSectionListFromBuffer('DEVICE', content);
   const ID:string = ini.getValueByKeyFromList('ID', IDList, '');
   //получаю содержимое секции [vars]
   const varsList: Array<string> = ini.getSectionListFromBuffer('vars', content);
-  console.log(varsList);
   //преобразую [vars] в объект
   //для быстрого доступа к шкалам и вычислению их значений
   const vars:TVars = new TVars(varsList);
-  /*
-  console.log(vars.getScale('0,156'));
-  console.log(vars.getScale('IsScale'));
-  console.log(vars.getScale('IsScale*1,8'));
-  console.log(vars.getScale('IrScale'));
-  console.log(vars.getScale('IrScale%1,8'));
-  console.log(vars.getScale('IrScale*1,8'));
-  */
   //теперь гружу секцию [FLASH] - параметры в ней, как ы CD имеют
   //опциональную часть в которой содержится уставка, в RAM такого нет
   //поэтому секции с уставками можно рассматривать как наиболее полно описывающие

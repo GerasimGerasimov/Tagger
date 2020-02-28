@@ -32,7 +32,6 @@ export class AppServer implements IServer{
     }
 
     private async getDeviceTags (request: any, response: any) {
-        //console.log(`/v1/devices/put> ${request.body.cmd || ''}`);
             try {
                 const result = await this.proc(request.body)
                 response.json( {'status':'OK',
