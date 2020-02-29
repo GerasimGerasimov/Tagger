@@ -15,7 +15,7 @@ const Hosts: THosts = new THosts();
 const TagsSource: TTagsSource = new TTagsSource();
 const Devices: TDevices = new TDevices(TagsSource);
 
-Hosts.HostsMap.forEach((Host:THost, HostName:string) => {
+Hosts.HostsMap.forEach((Host:THost) => {
     const FieldBus:TFieldBus = new TFieldBusModbusRTU();
     Devices.DevicesMap.forEach ((DeviceProperties: TAddressableDevice, DeviceName: string)=>{
         DeviceProperties.FieldBus = FieldBus;//теперь знаю каким протоколом обрабатывается устройство
@@ -42,12 +42,12 @@ async function getSlotsData(request: Object, SlotsDataRequest :TSlotsDataRequest
     const result: Object = {[PositionName]:{}};
     for (const SlotDataRequest of SlotsDataRequest.SlotDataRequest){
         const slot:TSlot = host.SlotsMap.get(SlotDataRequest.SlotName);
+        const Tag: TParameters = SlotsDataRequest.AddressableDevice.Tags[SlotDataRequest.SectionName.toLowerCase()]
         try {
             await host.getSlotData(slot)//обновляю данные хоста
-            FieldBus.checkFolderOfAnswer(slot);
+            FieldBus.checkHeaderOfAnswer(slot);
             const RawData: Array<any> = FieldBus.getRawData(slot.msg);
             FieldBus.checkRequiredData(RawData, slot);
-            const Tag: TParameters = SlotsDataRequest.AddressableDevice.Tags[SlotDataRequest.SectionName.toLowerCase()]
             const RawDataMap: Map<number, any> = FieldBus.convertRawDataToMap(RawData, slot.slotSet.RegsRange.first);
             Tag.setDataToParameters(RawDataMap);
             const data: Object = Tag.getRequiredParameters(SlotDataRequest.Request);

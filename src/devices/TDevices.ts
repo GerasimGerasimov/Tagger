@@ -1,10 +1,11 @@
 import * as utils from '../utils/utils';
 import * as device from './ModelDevice';
 import TTagsSource from './TTagsSource';
-import {TFieldBus} from '../fieldbus/TFieldBus'
+import {TFieldBus} from '../fieldbus/TFieldBus';
+import path = require('path');
 
-const DevicesDir: string = `${utils.ConfDirName}/devices`;//ту хранятся U1, U2 и т.п.
-
+//const DevicesDir: string = `${utils.ConfDirName}/devices`;//ту хранятся U1, U2 и т.п.
+const DevicesDir: string = path.resolve(__dirname,`../../${utils.ConfDirName}/devices`);
 export class TNodeDevices {
     addr: number;
     host: string;

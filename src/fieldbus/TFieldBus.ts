@@ -39,7 +39,7 @@ export abstract class TFieldBus {
         return result;
     }
 
-    public checkFolderOfAnswer(slot:TSlot) {
+    public checkHeaderOfAnswer(slot:TSlot) {
     }
 
     public checkRequiredData(data: Array<any>, slot:TSlot){

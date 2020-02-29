@@ -1,8 +1,9 @@
 import {THost} from './THost'
 import * as utils from '../utils/utils';
+import path = require('path');
 
-const HostsDir: string = `${utils.ConfDirName}/nodes`;
-
+//const HostsDir: string = `${utils.ConfDirName}/nodes`;
+const HostsDir: string = path.resolve(__dirname,`../../${utils.ConfDirName}/nodes`);
 //Карта Хостов
 export class THosts {
     public HostsMap = new  Map<string, THost>();
