@@ -40,7 +40,7 @@ async function getSlotsData(request: Object, SlotsDataRequest :TSlotsDataRequest
     const FieldBus: TFieldBus = SlotsDataRequest.AddressableDevice.FieldBus;
     const PositionName = SlotsDataRequest.PositionName;
     const result: Object = {[PositionName]:{}};
-    
+    /*
     const loadOneSlot = async (SlotDataRequest:TSlotDataRequest) => {
         const slot:TSlot = host.SlotsMap.get(SlotDataRequest.SlotName);
         const Tag: TParameters = SlotsDataRequest.AddressableDevice.Tags[SlotDataRequest.SectionName.toLowerCase()]
@@ -68,7 +68,8 @@ async function getSlotsData(request: Object, SlotsDataRequest :TSlotsDataRequest
     } 
     const requests = SlotsDataRequest.SlotDataRequest.map(item => loadOneSlot(item));
     await Promise.all(requests);
-    /*
+    */
+    
     for (const SlotDataRequest of SlotsDataRequest.SlotDataRequest){
         const slot:TSlot = host.SlotsMap.get(SlotDataRequest.SlotName);
         const Tag: TParameters = SlotsDataRequest.AddressableDevice.Tags[SlotDataRequest.SectionName.toLowerCase()]
@@ -94,7 +95,7 @@ async function getSlotsData(request: Object, SlotsDataRequest :TSlotsDataRequest
             };
         }
         
-    }*/
+    }
     return result;
 }
 
