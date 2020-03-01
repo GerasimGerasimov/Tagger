@@ -56,4 +56,25 @@ export default class HostController {
         }
     }
 
+    public static async getRequiredSlotsData(host: string, required: Array<string>):Promise<any | IErrorMessage> {
+        try {
+            const header: any = {
+                method: 'PUT',
+                mode: 'cors',
+                cache: 'no-cache',
+                headers: {
+                    'Content-Type':'application/json; charset=utf-8',
+                },
+                body:JSON.stringify({slots:required})
+            }
+            const url:string = `${host}/v2/slots/`;
+            return await fetch(url, header)
+                .then (this.handledHTTPResponse)
+                .then (this.validationJSON);
+        } catch(e) {
+            console.log(e);
+            throw new Error (`Fetch Error: ${e.message}`);
+        }
+    }    
+
 }
