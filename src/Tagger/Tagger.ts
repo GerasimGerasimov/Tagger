@@ -10,14 +10,14 @@ export default class Tagger {
     private static Hosts: THosts;
     private static Devices: TDevices;
     public static _initialize (Hosts: THosts, Devices: TDevices) {
-        this.Hosts = Hosts;
-        this.Devices = Devices; 
+        Tagger.Hosts = Hosts;
+        Tagger.Devices = Devices; 
     }
 
     public static async getgetDeviceData(request: Object): Promise<any> {
-        const SlotsDataRequest :TSlotsDataRequest  = this.Devices.getSlotsDataRequest(request);
-        const host:THost = this.Hosts.getHostByName(SlotsDataRequest.Host);
-        const result: any = await this.getSlotsData(SlotsDataRequest, host);
+        const SlotsDataRequest :TSlotsDataRequest  = Tagger.Devices.getSlotsDataRequest(request);
+        const host:THost = Tagger.Hosts.getHostByName(SlotsDataRequest.Host);
+        const result: any = await Tagger.getSlotsData(SlotsDataRequest, host);
         return result;
     }
 
@@ -33,7 +33,7 @@ export default class Tagger {
                 'msg': e.message
             };
         }
-        return this.fillRespond(SlotsDataRequest, host);
+        return Tagger.fillRespond(SlotsDataRequest, host);
     }
     
     private static fillRespond(SlotsDataRequest :TSlotsDataRequest, host:THost): any {
