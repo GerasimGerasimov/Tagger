@@ -22,10 +22,9 @@ export class THosts {
     private parseNodeList(props:Array<utils.IDirСontents>) {
         props.forEach(item => {
             var o = JSON.parse(item.Content)
-            const Host:THost = new THost();
+            const Host:THost = new THost(o.HOST.url);
             Host.Name = o.name;
             Host.fieldbus = o.fieldbus;
-            Host.URL = o.HOST.url;
             this.HostsMap.set(o.name, Host);
         })
     }

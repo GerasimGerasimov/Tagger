@@ -1,8 +1,8 @@
 import {TFieldBus} from '../fieldbus/TFieldBus'
 import {TSlot, TDeviceAnswer} from '../slots/TSlotSet'
 
-import {THosts} from '../devices/THosts';
-import {THost} from '../devices/THost';
+import {THosts} from '../client/THosts';
+import {THost} from '../client/THost';
 import {TDevices, TSlotsDataRequest} from '../devices/TDevices';
 import { TParameters } from '../devices/TagTypes/TParameters'
 

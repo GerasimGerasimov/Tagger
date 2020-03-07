@@ -1,12 +1,18 @@
 import {TSlot, TSlotSet} from '../slots/TSlotSet'
-import HostController from '../controllers/hostscontroller'
+import HostController from '../controllers/ws/controller'
 
 export class THost {
     public Name: string;
     public fieldbus: string = '';//адрес в сети или полевой шине
     public URL: string = 'localhost';
-
     public SlotsMap = new  Map<string, TSlot>();
+
+    private host: HostController;
+
+    constructor (host: string) {
+        this.URL = host;
+        this.host = new HostController(host);
+    }
 
     public addSlotSetToMap(SlotSet: TSlotSet){
         const Slot = new TSlot();
@@ -19,7 +25,7 @@ export class THost {
     public async setSlotSetsToHost(){
         for (const Slot of this.SlotsMap.values()) {
             try {
-                let result = await HostController.putSlotSetToHost(this.URL, Slot.slotSet);
+                let result = await this.host.putSlotSetToHost(this.URL, Slot.slotSet);
                 Slot.status = 'SlotSet added';
                 Slot.msg = '';
             } catch (e) {
@@ -32,7 +38,7 @@ export class THost {
 
     public async getSlotData(Slot:TSlot){
         try {
-            const result = await HostController.getSlotDataByID(this.URL, Slot.slotSet.ID);
+            const result = await this.host.getSlotDataByID(this.URL, Slot.slotSet.ID);
             Slot = Object.assign(Slot, result)
         } catch(e) {
             console.log(e);
@@ -46,7 +52,7 @@ export class THost {
             let slots: Array<string> = Slots.map((item:TSlot)=>{
                 return item.slotSet.ID;
             });
-            const result = await HostController.getRequiredSlotsData(this.URL, slots);
+            const result = await this.host.getRequiredSlotsData(this.URL, slots);
             for (const key in result.slots) {
                 let slot:TSlot = this.SlotsMap.get(key);
                 slot = Object.assign(slot,result.slots[key]);

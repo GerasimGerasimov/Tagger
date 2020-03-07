@@ -1,9 +1,9 @@
-import {THosts} from './devices/THosts';
+import {THosts} from './client/THosts';
 import {TDevices} from './devices/TDevices';
 import TTagsSource from './devices/TTagsSource';
 import {initSlotSets} from './initslotsets/InitSlotSets';
 import Tagger from './Tagger/Tagger';
-import {AppServer, IServer} from "./server/server";
+import {AppServer, IServer} from "./servers/http/server";
 
 const Hosts: THosts = new THosts();
 const TagsSource: TTagsSource = new TTagsSource();

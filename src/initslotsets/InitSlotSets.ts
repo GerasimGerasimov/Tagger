@@ -1,5 +1,5 @@
-import {THost} from '../devices/THost';
-import {THosts} from '../devices/THosts';
+import {THost} from '../client/THost';
+import {THosts} from '../client/THosts';
 import {TDevices, TAddressableDevice} from '../devices/TDevices';
 import {TSlotSet} from '../slots/TSlotSet'
 import {TFieldBus, TSlotSource} from '../fieldbus/TFieldBus'

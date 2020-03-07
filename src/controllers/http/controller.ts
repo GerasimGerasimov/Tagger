@@ -1,9 +1,12 @@
 const fetch = require('node-fetch');
-import {IErrorMessage} from '../utils/types'
+import {IErrorMessage} from '../../utils/types'
 
 export default class HostController {
 
-    public static async putSlotSetToHost(host: string, Slot: any):Promise<any | IErrorMessage> {
+    constructor (host: string){
+    }
+
+    public async putSlotSetToHost(host: string, Slot: any):Promise<any | IErrorMessage> {
         try {
             const header: any = {
                 method: 'PUT',
@@ -23,12 +26,12 @@ export default class HostController {
         }
     }
 
-    private static handledHTTPResponse (response: any) {
+    private handledHTTPResponse (response: any) {
         if (response.status === 404) throw new Error ('Url not found');
         return response.text();
     }
 
-    private static validationJSON (data: any): any | IErrorMessage {
+    private validationJSON (data: any): any | IErrorMessage {
         try {
             return JSON.parse(data);
         } catch (e) {
@@ -36,7 +39,7 @@ export default class HostController {
         }
     }
 
-    public static async getSlotDataByID(host: string, ID: string):Promise<any | IErrorMessage> {
+    public async getSlotDataByID(host: string, ID: string):Promise<any | IErrorMessage> {
         try {
             const header: any = {
                 method: 'GET',
@@ -56,7 +59,7 @@ export default class HostController {
         }
     }
 
-    public static async getRequiredSlotsData(host: string, required: Array<string>):Promise<any | IErrorMessage> {
+    public async getRequiredSlotsData(host: string, required: Array<string>):Promise<any | IErrorMessage> {
         try {
             const header: any = {
                 method: 'PUT',
