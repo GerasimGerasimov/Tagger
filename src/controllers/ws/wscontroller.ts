@@ -1,5 +1,4 @@
 import WebSocket = require('ws');
-import {delay} from '../../utils/delay'
 
 export default class WSControl {
 
@@ -28,17 +27,6 @@ export default class WSControl {
             }, 100);
         })
     }
-        /*
-        try {
-            const Timer = setInterval( ()=>{
-                if (this.hostState) { 
-                    clearInterval(Timer);
-                    throw new Error ('Connection Time Out');
-                }
-            }, 100);
-        } catch (e) {
-            console.log(`${e}: to ${this.host}`)
-        }   */     
 
     public async send(request: string): Promise<string> {
         return new Promise(async (resolve, reject) => {
