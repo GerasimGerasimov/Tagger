@@ -14,21 +14,32 @@ export default class WSControl {
         this.initSocket();
     }
 
-    public async waitForConnect() {
+    public async waitForConnect(): Promise<string> {
+        console.log('waitForConnect');
+        return new Promise(async (resolve, reject) => {
+            
+            if (this.hostState) return resolve();
+
+            const Timer = setInterval( ()=>{
+                if (this.hostState) { 
+                    clearInterval(Timer);
+                    return resolve();
+                }
+            }, 100);
+        })
+    }
+        /*
         try {
             const Timer = setInterval( ()=>{
-                if (!this.hostState) { 
+                if (this.hostState) { 
                     clearInterval(Timer);
                     throw new Error ('Connection Time Out');
                 }
-            }, 1000);
-            while (!this.hostState) {
-                await delay(100)
-            };
+            }, 100);
         } catch (e) {
             console.log(`${e}: to ${this.host}`)
-        }        
-    }
+        }   */     
+
     public async send(request: string): Promise<string> {
         return new Promise(async (resolve, reject) => {
             try {

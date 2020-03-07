@@ -7,10 +7,9 @@ export default class HostController {
     
     constructor (host: string){
         this.wss = new WSControl(host);
-        this.waitForConnect();
     }
     
-    private async waitForConnect(){
+    public async waitForConnect(){
         await this.wss.waitForConnect();
     }
 

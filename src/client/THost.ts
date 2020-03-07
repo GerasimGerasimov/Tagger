@@ -25,6 +25,7 @@ export class THost {
     public async setSlotSetsToHost(){
         for (const Slot of this.SlotsMap.values()) {
             try {
+                await this.host.waitForConnect();
                 let result = await this.host.putSlotSetToHost(this.URL, Slot.slotSet);
                 Slot.status = 'SlotSet added';
                 Slot.msg = '';
