@@ -14,11 +14,9 @@ export default class WSControl {
     }
 
     public async waitForConnect(): Promise<string> {
-        console.log('waitForConnect');
         return new Promise(async (resolve, reject) => {
-            
             if (this.hostState) return resolve();
-
+            console.log('waitForConnect');
             const Timer = setInterval( ()=>{
                 if (this.hostState) { 
                     clearInterval(Timer);
@@ -47,8 +45,6 @@ export default class WSControl {
                 }, 3000);
                 this.ws.onmessage = (msg: any) => {
                     clearTimeout(timeOutTimer);
-                    console.log(`onMessage: ${this.count++} ${msg.data}`);
-                    //return resolve(Array.prototype.slice.call(msg.data,0));
                     return resolve(msg.data);
                 }            
                 //Ecли ошибка сокета  

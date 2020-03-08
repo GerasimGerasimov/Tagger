@@ -1,16 +1,14 @@
+import http = require('http');
 import express = require("express");
 import bodyParser = require('body-parser');
 
 const app = express();
 const jsonParser = bodyParser.json()
 
-export interface IServer {
-    serve (): void;
-}
-
 interface getDeviceDataFunc {(request: Object): any;}
 
-export class AppServer implements IServer{
+export default class HttpServer{
+    public https: any;
 
     private port: number;
     private proc: getDeviceDataFunc  = undefined;
@@ -29,6 +27,11 @@ export class AppServer implements IServer{
             res.setHeader('Access-Control-Allow-Headers', 'origin, content-type, accept');
             next();
         });
+
+        app.route('/v1/devices/')
+            .put   (jsonParser, [this.getDeviceTags.bind(this)]);
+        
+        this.https = http.createServer(app).listen(this.port);
     }
 
     private async getDeviceTags (request: any, response: any) {
@@ -42,11 +45,4 @@ export class AppServer implements IServer{
                                             'msg': e.message || ''})
             }
     }
-
-    public serve (): void {
-        app.route('/v1/devices/')
-            .put   (jsonParser, [this.getDeviceTags.bind(this)]);
-
-        app.listen(this.port);
-    } 
 }
