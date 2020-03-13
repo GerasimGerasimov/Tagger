@@ -14,26 +14,31 @@ export default class Tagger {
         Tagger.Devices = Devices; 
     }
 
-    public static async getgetDeviceData(request: Object): Promise<any> {
-        const SlotsDataRequest :TSlotsDataRequest  = Tagger.Devices.getSlotsDataRequest(request);
-        const host:THost = Tagger.Hosts.getHostByName(SlotsDataRequest.Host);
-        const result: any = await Tagger.getSlotsData(SlotsDataRequest, host);
-        return result;
+    public static async getDeviceData(request: Object): Promise<any> {
+        return new Promise(async (resolve, reject) => {
+            const SlotsDataRequest :TSlotsDataRequest  = Tagger.Devices.getSlotsDataRequest(request);
+            const host:THost = Tagger.Hosts.getHostByName(SlotsDataRequest.Host);
+            const result: any = await Tagger.getSlotsData(SlotsDataRequest, host);
+            //return result;            
+            return resolve(result);
+          });
     }
 
     private static async getSlotsData(SlotsDataRequest :TSlotsDataRequest, host:THost): Promise<any>{   
-        const slots: Array <TSlot> = SlotsDataRequest.SlotDataRequest.map((SlotDataRequest) => {
-            return host.SlotsMap.get(SlotDataRequest.SlotName);
-        })
-        try {
-            await host.getRequiredSlotsData(slots)//обновляю данные хоста
-        } catch (e) {
-            return {
-                'status':'Error',
-                'msg': e.message
-            };
-        }
-        return Tagger.fillRespond(SlotsDataRequest, host);
+        return new Promise(async (resolve, reject) => {
+            const slots: Array <TSlot> = SlotsDataRequest.SlotDataRequest.map((SlotDataRequest) => {
+                return host.SlotsMap.get(SlotDataRequest.SlotName);
+            })
+            try {
+                await host.getRequiredSlotsData(slots)//обновляю данные хоста
+            } catch (e) {
+                return {
+                    'status':'Error',
+                    'msg': e.message
+                };
+            }
+            return resolve(Tagger.fillRespond(SlotsDataRequest, host));
+        });
     }
     
     private static fillRespond(SlotsDataRequest :TSlotsDataRequest, host:THost): any {

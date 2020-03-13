@@ -36,14 +36,17 @@ export default class HostController {
     }
 
     public async getRequiredSlotsData(host: string, required: Array<string>):Promise<any | IErrorMessage> {
-        try {
-            const payload: string = JSON.stringify({get:required});
-            return await this.wss.send(payload)            
-                .then (this.validationJSON);
-        } catch(e) {
-            console.log(e);
-            throw new Error (`Fetch Error: ${e.message}`);
-        }
+        return new Promise(async (resolve, reject) => {
+            try {
+                const payload: string = JSON.stringify({get:required});
+                const result = await this.wss.send(payload)
+                               .then (this.validationJSON);
+                return resolve (result);
+            } catch(e) {
+                console.log(e);
+                reject (new Error (`Fetch Error: ${e.message}`));
+            }
+        });
     }    
 
     private validationJSON (data: any): any | IErrorMessage {

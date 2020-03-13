@@ -1,3 +1,7 @@
+//криптография
+import crypto = require('crypto');
+import base64url from 'base64url'
+
 export interface IParsedAnswer {
     addr: Number,
     cmd: Number,
@@ -31,4 +35,8 @@ export function validationJSON (data: any): any | IErrorMessage {
 export function ErrorMessage(msg: string): IErrorMessage {
     const ErrorMsg: IErrorMessage = {status: 'Error', msg};
     return ErrorMsg;
+}
+
+export function randomStringAsBase64Url(size: number): string {
+    return base64url(crypto.randomBytes(size));
 }

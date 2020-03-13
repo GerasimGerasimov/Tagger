@@ -48,20 +48,23 @@ export class THost {
         }
     }
 
-    public async getRequiredSlotsData(Slots:Array<TSlot>){
-        try {
-            let slots: Array<string> = Slots.map((item:TSlot)=>{
-                return item.slotSet.ID;
-            });
-            const result = await this.host.getRequiredSlotsData(this.URL, slots);
-            for (const key in result.slots) {
-                let slot:TSlot = this.SlotsMap.get(key);
-                slot = Object.assign(slot,result.slots[key]);
-            } 
-        } catch(e) {
-            console.log(e);
-            throw new Error(`getRequiredSlotsData: ${e}`)
-        }
+    public async getRequiredSlotsData(Slots:Array<TSlot>):Promise<any>{
+        return new Promise(async (resolve, reject) => {
+            try {
+                let slots: Array<string> = Slots.map((item:TSlot)=>{
+                    return item.slotSet.ID;
+                });
+                const result = await this.host.getRequiredSlotsData(this.URL, slots);
+                for (const key in result.slots) {
+                    let slot:TSlot = this.SlotsMap.get(key);
+                    slot = Object.assign(slot,result.slots[key]);
+                } 
+                return resolve();
+            } catch(e) {
+                console.log(e);
+                reject (new Error(`getRequiredSlotsData: ${e}`))
+            }
+        });
     }
     
 }

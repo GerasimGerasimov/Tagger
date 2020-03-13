@@ -1,61 +1,84 @@
 import WebSocket = require('ws');
-import {IErrorMessage, ErrorMessage, validationJSON} from '../../utils/types'
-
-interface getDeviceDataFunc {(request: Object): any;}
+import {IErrorMessage, ErrorMessage, validationJSON, randomStringAsBase64Url} from '../../utils/types'
+import {TTask, TMessage} from './types'
 
 export default class Socket {
     private ws: WebSocket
-    private proc: getDeviceDataFunc  = undefined;
-    private commands: any;
+    public  commands: Set<TTask>;
+    
+    public ID: string = '';
 
-    constructor (ws: WebSocket, proc: getDeviceDataFunc){
+    constructor (ws: WebSocket){
         this.ws = ws;
-        this.proc = proc;
-        this.commands = {
-            'get'    : this.getDeviceTags.bind(this),
-            'default': () => {
-                return ErrorMessage('Unknown command');
-            }
-        }
+        this.ID = randomStringAsBase64Url(4);
+        this.commands = new Set<TTask>();
         this.ws.on('message', this.onMessage.bind(this));
         this.ws.on('close', this.onClose.bind(this))
     }
 
+    public async send (message: any) {
+        await this.waitBufferRelease();
+        this.ws.send(JSON.stringify(message));
+    }
+
     private async onMessage(message: any) {
-        var result: any;
         try {
             const request = validationJSON(message);
-            result = await this.decodeCommand(request);
+            this.decodeCommand(request);
         } catch (e) {
-            result = ErrorMessage(e.message || '');
+            this.onTakeServerMessage(ErrorMessage(e.message || ''));
         }
-        this.ws.send(JSON.stringify(result));
     }
 
     private onClose(){
         console.log('Connection close');
     }
 
-    private async decodeCommand(cmd: any): Promise<any | IErrorMessage> {
-        const key = this.getCmdName(cmd);
-        return await (this.commands[key] || this.commands['default'])(cmd[key])
+    private onTakeServerMessage(respond: any) {
+        this.ws.send(JSON.stringify(respond));
     }
 
-    private getCmdName(cmd: any): string {
-        for (let key in cmd) {
-            return key;
-          }
-        throw new Error ('Invalid request format');
+    private decodeCommand(msg: TMessage){
+        const key = msg.Task.cmd;
+        const commands = {
+            'get'    : this.addCmdToList.bind(this),
+            'default': () => {
+                return ErrorMessage('Unknown command');
+            }
+        };
+        (commands[key] || commands['default'])(msg)
     }
 
-    private async getDeviceTags (request: any): Promise<any | IErrorMessage> {
-        try {
-            const result = await this.proc(request)
-            return {status:'OK',
-                    time: new Date().toISOString(),
-                    data:result}
-        } catch (e) {
-            return ErrorMessage(e.message || '');
+    private addCmdToList(msg: TMessage) {
+        const respond = {
+            confirm:msg.Task.MessageID
         }
-    }    
+        this.onTakeServerMessage(respond);
+        this.commands.add(msg.Task);
+    }  
+
+        //чтени сокета в режиме запрос-ожидание ответа- ответ
+    public async waitBufferRelease(): Promise<any> {
+        return new Promise((resolve, reject) => {
+            var timeOutTimer: any = undefined;
+            var chekBufferTimer: any = undefined;
+            if (this.ws.bufferedAmount === 0)
+                return resolve('OK, buffer is empty'); //буфер чист
+            //ошибка, если буфер не очистился за 1 сек 
+            timeOutTimer = setTimeout( () => {
+                clearTimeout(timeOutTimer);
+                clearInterval(chekBufferTimer);
+                reject(new Error ('Time out, buffer does not empty'))
+            }, 1000);
+            //постоянная проверка буфера на очистку
+            chekBufferTimer = setInterval( () => {
+                if (this.ws.bufferedAmount === 0) {
+                    clearTimeout(timeOutTimer);
+                    clearInterval(chekBufferTimer);
+                    return resolve('OK, buffer is empty'); //буфер чист
+                }
+            }, 1);
+        });
+    }
+
 }
