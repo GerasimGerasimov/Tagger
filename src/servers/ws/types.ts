@@ -5,6 +5,14 @@ export class TTask {
 }
 
 export class TMessage {
-    ClientID: string;
-    Task: TTask;
+    ClientID: string = '';
+    MessageID: string = '';
+    cmd: string = '';
+    payload: any = {};
+}
+
+export class TRespond {
+    MessageID: string = '';
+    cmd: string = '';
+    payload: any = {};
 }

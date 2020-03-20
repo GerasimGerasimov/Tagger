@@ -81,7 +81,7 @@ export default class WSControl {
         setTimeout(() => {
             console.log(`Try connect to ${this.host}`);
             this.initSocket();
-        }, 1000);        
+        }, 3000);        
     }
 
     //чтени сокета в режиме запрос-ожидание ответа- ответ

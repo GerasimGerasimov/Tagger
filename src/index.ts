@@ -18,15 +18,6 @@ const Server: HttpServer = new HttpServer(5004, Tagger.getDeviceData);
 const WSS: WSServer = new WSServer(Server.https, getDeviceData);//Tagger.getgetDeviceData);
 console.log('Tagger Service started');
 
-var count: number = 0;
-
-const Queue: Array<any> = []
-
-function setToQueue(arg: any) {
-  Queue.push({arg});
-  console.log(`setToQueue: ${Queue.length}`);
-}
-
 async function getDeviceData(request: any): Promise<any> {
   var result: any;
   try {
@@ -39,43 +30,6 @@ async function getDeviceData(request: any): Promise<any> {
   }
   return result;
 }
-
-function scanQueue() {
-  setInterval(async ()=> {
-    if (Queue.length !=0) {
-      const settings: any = Queue.shift();
-      var result: any;
-      try {
-        const respond = await Tagger.getDeviceData(settings.arg.request);
-        result = {  status:'OK',
-                    time: new Date().toISOString(),
-                    data:respond }
-      } catch (e) {
-        result = ErrorMessage(e.message)
-      }
-      console.log(`scanQueue[${settings.arg.ID}]: ${count} > ${Queue.length}`);
-      settings.arg.callback(result);
-    }
-  }, 10);
-};
-
-scanQueue();
-
-/*  return new Promise(async (resolve, reject) => {
-      console.log(`respond ${count++}: ${request}`);
-      const result = await Tagger.getgetDeviceData(request)
-      return resolve(result);
-  }); */
-async function returnTestData(request: any) {
-  return new Promise((resolve, reject) => {
-    setTimeout(()=> {
-      //const respond = getTestData();
-      console.log(`respond ${count++}: ${request}`)
-      return resolve(request);
-    }, 0);
-  });
-}
-
 function getTestData() {
   return {
         "status": "OK",

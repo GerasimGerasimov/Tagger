@@ -1,9 +1,6 @@
-
 import WebSocket = require('ws');
-import {IErrorMessage, ErrorMessage, validationJSON} from '../../utils/types'
 interface getDeviceDataFunc {({}): any;}
-import Socket from './wsone';
-import {TTask, TMessage} from './types'
+import {Socket, TSocketParameters} from './wsone';
 
 export default class WSServer {
     private https: any;
@@ -18,7 +15,6 @@ export default class WSServer {
         this.proc = proc;
         this.sockets = new Set<Socket>();
         this.init();
-        this.cycle();
     }
 
     private init () {           
@@ -28,46 +24,35 @@ export default class WSServer {
 
     private connectionOnWss( ws: WebSocket) {
         console.log('Connection');
-        let socket: Socket = new Socket(ws);
-        this.sockets.add(socket);
-        socket.send({id: socket.ID})
-    }
-
-    private async cycle() {
-        while (true) {
-            try {
-                for (let socket of this.sockets.values()) {
-                    for (let task of socket.commands.values()) {
-                        console.log(this.count++, task);
-                        const respond = await this.decodeCommand(task);
-                        socket.send(respond);
-                    }
-                }
-            } catch (e) {
-                console.log(`Error: ${e}`);
-            }
-            await this.delay(1);
+        let arg: TSocketParameters = {
+            ws,
+            onCloseAction: this.closeSocket.bind(this),
+            onGetData: this.getData.bind(this)
         }
+        let socket: Socket = new Socket(arg);
+        this.sockets.add(socket);
+        //отправляю сообщение с идентификатором подключения
+        socket.send({cmd:'id',
+                     payload: socket.ID})
     }
 
-    private async delay(ms: number): Promise<any> {
-        return new Promise((resolve, reject) => {
-          setTimeout(resolve, ms);
-        });
-    }
-    private async decodeCommand(task: TTask): Promise<any>{
-        const key = task.cmd;
-        const commands = {
-            'get'    : this.getData.bind(this),
-            'default': () => {
-                return ErrorMessage('Unknown command');
-            }
-        };
-        return (commands[key] || commands['default'])(task)
+    private closeSocket(ID: string){
+        console.log(ID);
+        try {
+            this.sockets.forEach((socket: Socket) => {
+                if (socket.ID === ID) {
+                    this.sockets.delete(socket);
+                    throw new Error(`Connection ${ID} has closed`)
+                }
+            })
+        } catch (e) {
+            console.log(e);
+        } 
     }
 
-    private async getData(task:TTask): Promise<any>{
-        const result = await this.proc(task.payload);
-        return {get:result};
+    private async getData(request: any): Promise<any>{
+        const payload = await this.proc(request);
+        return payload;
     }
+
 }

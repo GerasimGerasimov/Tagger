@@ -1,17 +1,25 @@
 import WebSocket = require('ws');
-import {IErrorMessage, ErrorMessage, validationJSON, randomStringAsBase64Url} from '../../utils/types'
-import {TTask, TMessage} from './types'
+import {ErrorMessage, validationJSON, randomStringAsBase64Url} from '../../utils/types'
+import {TTask, TMessage, TRespond} from './types'
 
-export default class Socket {
+export class TSocketParameters {
+    ws: WebSocket;
+    onCloseAction: Function;
+    onGetData: Function;
+}
+
+export class Socket {
     private ws: WebSocket
     public  commands: Set<TTask>;
-    
     public ID: string = '';
+    private onCloseAction: Function;
+    private onGetData: Function;
 
-    constructor (ws: WebSocket){
-        this.ws = ws;
+    constructor (arg: TSocketParameters){
+        this.ws = arg.ws;
         this.ID = randomStringAsBase64Url(4);
-        this.commands = new Set<TTask>();
+        this.onCloseAction = arg.onCloseAction;
+        this.onGetData = arg.onGetData;
         this.ws.on('message', this.onMessage.bind(this));
         this.ws.on('close', this.onClose.bind(this))
     }
@@ -26,22 +34,19 @@ export default class Socket {
             const request = validationJSON(message);
             this.decodeCommand(request);
         } catch (e) {
-            this.onTakeServerMessage(ErrorMessage(e.message || ''));
+            this.send(ErrorMessage(e.message || ''));
         }
     }
 
     private onClose(){
         console.log('Connection close');
-    }
-
-    private onTakeServerMessage(respond: any) {
-        this.ws.send(JSON.stringify(respond));
+        this.onCloseAction(this.ID);
     }
 
     private decodeCommand(msg: TMessage){
-        const key = msg.Task.cmd;
+        const key = msg.cmd;
         const commands = {
-            'get'    : this.addCmdToList.bind(this),
+            'get'    : this.getData.bind(this),
             'default': () => {
                 return ErrorMessage('Unknown command');
             }
@@ -49,15 +54,18 @@ export default class Socket {
         (commands[key] || commands['default'])(msg)
     }
 
-    private addCmdToList(msg: TMessage) {
-        const respond = {
-            confirm:msg.Task.MessageID
-        }
-        this.onTakeServerMessage(respond);
-        this.commands.add(msg.Task);
+    private async getData(msg: TMessage) {
+        const payload = await this.onGetData(msg.payload);
+        const respond: TRespond = {
+            MessageID: msg.MessageID,
+            cmd: 'get',
+            payload
+        };
+        console.log(`send: ${this.ID} msg: ${msg.MessageID} time ${new Date().getTime()}`)
+        this.send(respond);
     }  
 
-        //чтени сокета в режиме запрос-ожидание ответа- ответ
+    //чтени сокета в режиме запрос-ожидание ответа- ответ
     public async waitBufferRelease(): Promise<any> {
         return new Promise((resolve, reject) => {
             var timeOutTimer: any = undefined;
