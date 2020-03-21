@@ -50,8 +50,8 @@ export default class WSServer {
         } 
     }
 
-    private async getData(request: any): Promise<any>{
-        const payload = await this.proc(request);
+    private getData(request: any): any {
+        const payload = this.proc(request);
         return payload;
     }
 

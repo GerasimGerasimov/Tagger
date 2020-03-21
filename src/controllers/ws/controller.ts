@@ -1,23 +1,43 @@
 import WSControl from './wscontroller'
-import {IErrorMessage} from '../../utils/types'
+import {IErrorMessage, IServiceRespond, validationJSON, ErrorMessage} from '../../utils/types'
 
 export default class HostController {
 
     private  wss: WSControl;
+    private onIncomingMessage: Function = undefined;
     
-    constructor (host: string){
-        this.wss = new WSControl(host);
+    constructor (host: string, handler: Function){
+        this.wss = new WSControl(host, this.checkIncomingMessage.bind(this));
+        this.onIncomingMessage = handler;
     }
     
-    public async waitForConnect(){
-        await this.wss.waitForConnect();
+    public checkIncomingMessage(msg: any) {
+        let respond: any = validationJSON(msg);
+            respond = this.handledIncomingData(respond);
+        if (this.onIncomingMessage) this.onIncomingMessage(respond);
+    }
+
+    public handledIncomingData(respond: any): IServiceRespond | IErrorMessage {
+        try {
+            this.handleStatusField(respond);
+            this.handleErrorStatus(respond);
+            return respond as IServiceRespond;
+        } catch (e) {
+            return ErrorMessage (e.message);
+        }
+    }
+
+    private handleStatusField (respond: any): void {
+        if (!respond.status) throw new Error ('Status field does not exist');
+    }
+
+    private handleErrorStatus(respond: any): void {
+        if (respond.status === 'Error') throw new Error (respond.msg);
     }
 
     public async putSlotSetToHost(host: string, Slot: any):Promise<any | IErrorMessage> {
         try {
-            const payload: string = JSON.stringify({add:Slot});
-            return await this.wss.send(payload)
-                .then (this.validationJSON);
+            await this.wss.send({add:Slot})
         } catch(e) {
             console.log(e);
             throw new Error (`Fetch Error: ${e.message}`);

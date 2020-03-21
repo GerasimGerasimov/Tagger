@@ -3,7 +3,12 @@ import fs = require('fs');
 export const ConfDirName:string = './configuration';
 
 export function validateFolderExistence(dirName: string): void {
-    if (!fs.existsSync(dirName)) throw new Error(`Folder not exist: ${dirName}`)
+    if (fs.existsSync(dirName)) return;
+    newFunction();
+
+    function newFunction() {
+        throw new Error(`Folder not exist: ${dirName}`);
+    }
 }
 
 export function getFilesList(path: string): Array<string> {

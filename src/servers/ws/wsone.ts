@@ -54,9 +54,12 @@ export class Socket {
         (commands[key] || commands['default'])(msg)
     }
 
-    private async getData(msg: TMessage) {
-        const payload = await this.onGetData(msg.payload);
-        const respond: TRespond = {
+    private getData(msg: TMessage) {
+        var payload: any = {}
+        if (this.onGetData) {
+            payload = this.onGetData(msg.payload);
+        }
+        const respond  = {
             MessageID: msg.MessageID,
             cmd: 'get',
             payload

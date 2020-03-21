@@ -14,14 +14,15 @@ Tagger._initialize(Hosts, Devices);
 
 initSlotSets(Hosts, Devices);
 
+// TODO вычистить REST API версию
 const Server: HttpServer = new HttpServer(5004, Tagger.getDeviceData);
 const WSS: WSServer = new WSServer(Server.https, getDeviceData);//Tagger.getgetDeviceData);
 console.log('Tagger Service started');
 
-async function getDeviceData(request: any): Promise<any> {
+function getDeviceData(request: any): any {
   var result: any;
   try {
-    const respond = await Tagger.getDeviceData(request);
+    const respond = Tagger.getDeviceData(request);
     result = {  status:'OK',
                 time: new Date().toISOString(),
                 data:respond }
@@ -30,6 +31,7 @@ async function getDeviceData(request: any): Promise<any> {
   }
   return result;
 }
+
 function getTestData() {
   return {
         "status": "OK",

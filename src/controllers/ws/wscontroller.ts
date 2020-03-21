@@ -1,61 +1,24 @@
 import WebSocket = require('ws');
 
+interface handler {({}): any;}
+
 export default class WSControl {
 
     private host: string;
     private ws:WebSocket;
     private hostState: boolean = false;
+    private onIncomingMessage: handler;
 
-    private count: number = 0;
-
-    constructor (host: string){
+    constructor (host: string, handler: handler){
         this.host = host;
+        this.onIncomingMessage = handler;
         this.initSocket();
     }
 
-    public async waitForConnect(): Promise<string> {
-        return new Promise(async (resolve, reject) => {
-            if (this.hostState) return resolve();
-            console.log('waitForConnect');
-            const Timer = setInterval( ()=>{
-                if (this.hostState) { 
-                    clearInterval(Timer);
-                    return resolve();
-                }
-            }, 100);
-        })
-    }
-
-    public async send(request: string): Promise<string> {
-        return new Promise(async (resolve, reject) => {
-            try {
-                if (!this.hostState)
-                    reject( new Error ('WebSocket is not connected to host')) 
-                //отбой сразу если нет соединения
-                if (this.ws.readyState !== WebSocket.OPEN) 
-                    reject( new Error ('WebSocket is not connected to host'))
-                //как-то надо подождать если есть не отправленные байты
-                await  this.waitBufferRelease();
-                //теперь отправлю сообщение и дождусь на него ответ, или тайм аут
-                this.ws.send(request);
-                //ошибка, если буфер не получу ответ за 1 сек 
-                const timeOutTimer = setTimeout( ()=>{
-                    clearTimeout(timeOutTimer);
-                    reject(new Error ('time out'))
-                }, 3000);
-                this.ws.onmessage = (msg: any) => {
-                    clearTimeout(timeOutTimer);
-                    return resolve(msg.data);
-                }            
-                //Ecли ошибка сокета  
-                this.ws.onerror = (msg: any) => {
-                        clearTimeout(timeOutTimer);
-                        reject(new Error(msg));
-                }
-            } catch (e) {
-                return reject (new Error (e.message))
-            }                      
-        })
+    public async send(payload: any){
+        await this.waitForConnect();
+        await this.waitBufferRelease();
+        this.ws.send(JSON.stringify(payload));
     }
 
     // Инициализация сокета и восстановление связи
@@ -64,6 +27,7 @@ export default class WSControl {
         this.ws.onerror = this.onError.bind(this);
         this.ws.onopen = this.onOpen.bind(this);
         this.ws.onclose = this.onClose.bind(this);
+        this.ws.onmessage = this.onMessage.bind(this);
     }
 
     private onOpen(event: any) {
@@ -82,6 +46,23 @@ export default class WSControl {
             console.log(`Try connect to ${this.host}`);
             this.initSocket();
         }, 3000);        
+    }
+
+    private onMessage(msg: any) {
+        this.onIncomingMessage(msg.data);
+    }
+
+    private async waitForConnect(): Promise<string> {
+        return new Promise(async (resolve, reject) => {
+            if (this.hostState) return resolve();
+            console.log('waitForConnect');
+            const Timer = setInterval( ()=>{
+                if (this.hostState) { 
+                    clearInterval(Timer);
+                    return resolve();
+                }
+            }, 100);
+        })
     }
 
     //чтени сокета в режиме запрос-ожидание ответа- ответ
