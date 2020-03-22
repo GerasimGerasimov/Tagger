@@ -1,6 +1,8 @@
 import WebSocket = require('ws');
-import {ErrorMessage, validationJSON, randomStringAsBase64Url} from '../../utils/types'
+import {validationJSON} from '../../utils/types'
 import {TTask, TMessage, TRespond} from './types'
+import {ErrorMessage} from '../../utils/errors'
+import {randomStringAsBase64Url} from '../../utils/cryputils'
 
 export class TSocketParameters {
     ws: WebSocket;
@@ -59,7 +61,7 @@ export class Socket {
         if (this.onGetData) {
             payload = this.onGetData(msg.payload);
         }
-        const respond  = {
+        const respond: TRespond  = {
             MessageID: msg.MessageID,
             cmd: 'get',
             payload

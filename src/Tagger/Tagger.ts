@@ -5,6 +5,7 @@ import {THosts} from '../client/THosts';
 import {THost} from '../client/THost';
 import {TDevices, TSlotsDataRequest} from '../devices/TDevices';
 import { TParameters } from '../devices/TagTypes/TParameters'
+import {ErrorMessage} from '../utils/errors'
 
 export default class Tagger {
     private static Hosts: THosts;
@@ -15,10 +16,17 @@ export default class Tagger {
     }
 
     public static getDeviceData(request: Object): any {
-        const SlotsDataRequest :TSlotsDataRequest  = Tagger.Devices.getSlotsDataRequest(request);
-        const host:THost = Tagger.Hosts.getHostByName(SlotsDataRequest.Host);
-        const result: any = Tagger.fillRespond(SlotsDataRequest, host);
-        return result;
+        try {
+            const SlotsDataRequest :TSlotsDataRequest  = Tagger.Devices.getSlotsDataRequest(request);
+            const host:THost = Tagger.Hosts.getHostByName(SlotsDataRequest.Host);
+            const result: any = Tagger.fillRespond(SlotsDataRequest, host);
+            return {
+                status:'OK',
+                time: new Date().toISOString(),
+                data: result }
+        } catch (e) {
+            return ErrorMessage(e.message)
+        }
     }
    
     private static fillRespond(SlotsDataRequest :TSlotsDataRequest, host:THost): any {

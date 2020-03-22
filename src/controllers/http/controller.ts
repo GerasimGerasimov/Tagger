@@ -1,5 +1,5 @@
 const fetch = require('node-fetch');
-import {IErrorMessage} from '../../utils/types'
+import {IErrorMessage} from '../../utils/errors'
 
 export default class HostController {
 

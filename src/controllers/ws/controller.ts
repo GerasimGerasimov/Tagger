@@ -1,5 +1,6 @@
 import WSControl from './wscontroller'
-import {IErrorMessage, IServiceRespond, validationJSON, ErrorMessage} from '../../utils/types'
+import {IServiceRespond, validationJSON} from '../../utils/types'
+import {IErrorMessage, ErrorMessage}  from '../../utils/errors'
 
 export default class HostController {
 

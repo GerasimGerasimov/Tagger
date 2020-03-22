@@ -1,6 +1,6 @@
 import {TSlot, TSlotSet} from '../slots/TSlotSet'
 import HostController from '../controllers/ws/controller'
-import {IErrorMessage, ErrorMessage} from '../utils/types'
+import {IErrorMessage, ErrorMessage} from '../utils/errors'
 
 
 export class THost {
@@ -20,7 +20,7 @@ export class THost {
     //сервер передаёт подтверждения о выполненных командах
     //и "закидывает" данные по мере их появления
     private decodeCommand(msg: any): any | IErrorMessage {
-        const key = msg.cmd;
+        const key = msg.cmd || 'default';
         const commands = {
             'add'    : this.addSlotConfirmation.bind(this),
             'get'    : this.deliveredSlotData.bind(this),
@@ -41,18 +41,22 @@ export class THost {
                     }};
     */
     private deliveredSlotData(msg: any) {
-        const SlotID = this.getSlotID(msg);
-        console.log(`${this.count++} : ${SlotID}`);
-        let Slot: TSlot = this.SlotsMap.get(SlotID);
-        Slot = Object.assign(Slot,msg.slots[SlotID]);
+        try {
+            const SlotID: string = this.getSlotID(msg);
+            console.log(`${this.count++} : ${SlotID}`);
+            let Slot: TSlot = this.SlotsMap.get(SlotID);
+            Slot = Object.assign(Slot,msg.slots[SlotID]);
+        } catch (e) {
+            console.log(e.msg)
+        }
     }
 
-    private getSlotID(msg: any): string {
+    private getSlotID(msg: any): string | never {
         try{
             for (let key in msg.slots) {
                 return key;
             }
-            throw new Error ('Invalid request format');
+            throw new Error ('"Slots" field have no nested Objects');
         } catch (e) {
             throw new Error (e.msg);
         }

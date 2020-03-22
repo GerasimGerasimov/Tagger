@@ -1,16 +1,15 @@
 import {THost} from './THost'
-import * as utils from '../utils/utils';
-import path = require('path');
+import * as Utils from '../utils/utils';
 
-//const HostsDir: string = `${utils.ConfDirName}/nodes`;
-const HostsDir: string = path.resolve(__dirname,`../../${utils.ConfDirName}/nodes`);
+const HostsDir: string = Utils.getAbsDirPath('nodes');
+
 //Карта Хостов
 export class THosts {
     public HostsMap = new  Map<string, THost>();
     constructor(){
-        utils.validateFolderExistence(HostsDir);
-        let HostsDirList: Array<string> =  utils.getFilesList(HostsDir);
-        let NodesFilesProps = utils.getFilesProps(HostsDir, HostsDirList);
+        Utils.validateFolderExistence(HostsDir);
+        let HostsDirList: Array<string> =  Utils.getFilesList(HostsDir);
+        let NodesFilesProps = Utils.getFilesProps(HostsDir, HostsDirList);
         this.parseNodeList(NodesFilesProps);
     }
     public async sendSlotSetsToHosts(){
@@ -19,7 +18,7 @@ export class THosts {
         }
     }
 
-    private parseNodeList(props:Array<utils.IDirСontents>) {
+    private parseNodeList(props:Array<Utils.IDirСontents>) {
         props.forEach(item => {
             var o = JSON.parse(item.Content)
             const Host:THost = new THost(o.HOST.url);

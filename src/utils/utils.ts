@@ -1,6 +1,12 @@
 import fs = require('fs');
+import path = require('path');
 
-export const ConfDirName:string = './configuration';
+export const ConfDirName: string = path.resolve(__dirname,'../.././configuration/');
+
+export function getAbsDirPath(dir: string): string {
+    const result: string = path.resolve(`${ConfDirName}`, dir);
+    return result;
+}
 
 export function validateFolderExistence(dirName: string): void {
     if (fs.existsSync(dirName)) return;

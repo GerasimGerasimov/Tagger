@@ -1,11 +1,10 @@
-import * as utils from '../utils/utils';
+import * as Utils from '../utils/utils';
 import * as device from './ModelDevice';
 import TTagsSource from './TTagsSource';
 import {TFieldBus} from '../fieldbus/TFieldBus';
-import path = require('path');
 
-//const DevicesDir: string = `${utils.ConfDirName}/devices`;//ту хранятся U1, U2 и т.п.
-const DevicesDir: string = path.resolve(__dirname,`../../${utils.ConfDirName}/devices`);
+const DevicesDir: string = Utils.getAbsDirPath('devices');
+
 export class TNodeDevices {
     addr: number;
     host: string;
@@ -44,17 +43,17 @@ export class TDevices {
     public DevicesMap = new  Map<string, TAddressableDevice>();
 
     constructor(TagsSource: TTagsSource){
-        utils.validateFolderExistence(DevicesDir);
-        let DevicesFilesList: Array<string> =  utils.getFilesList(DevicesDir);
-        let DevicesFilesProps:Array<utils.IDirСontents> =  utils.getFilesProps(DevicesDir, DevicesFilesList);
+        Utils.validateFolderExistence(DevicesDir);
+        let DevicesFilesList: Array<string> =  Utils.getFilesList(DevicesDir);
+        let DevicesFilesProps:Array<Utils.IDirСontents> =  Utils.getFilesProps(DevicesDir, DevicesFilesList);
         this.parseNodeDevList(DevicesFilesProps);
         this.bindTagsSourceToDevTags(TagsSource);
     }
 
-    private parseNodeDevList(devs: Array<utils.IDirСontents>): any {
+    private parseNodeDevList(devs: Array<Utils.IDirСontents>): any {
         devs.forEach((item)=>{
             var o:TNodeDevices = JSON.parse(item.Content);
-            const name = utils.getNameFromFileName(item.FileName);
+            const name = Utils.getNameFromFileName(item.FileName);
             const result = this.DevicesMap.get(name);
             if (result === undefined) {
                 let device: TAddressableDevice = this.createNewAddressableDevice(name, o)//создать объект привязанный к U1

@@ -1,16 +1,9 @@
-//криптография
-import crypto = require('crypto');
-import base64url from 'base64url'
+import {IErrorMessage} from './errors'
 
 export interface IParsedAnswer {
     addr: Number,
     cmd: Number,
     msg: Array<number>
-}
-
-export interface IErrorMessage {
-    status: string,
-    msg: any
 }
 
 export interface IServiceRespond extends IErrorMessage {
@@ -30,13 +23,4 @@ export function validationJSON (data: any): any | IErrorMessage {
     } catch (e) {
         return {status: 'Error', msg: 'Invalid JSON'} as IErrorMessage;
     }
-}
-
-export function ErrorMessage(msg: string): IErrorMessage {
-    const ErrorMsg: IErrorMessage = {status: 'Error', msg};
-    return ErrorMsg;
-}
-
-export function randomStringAsBase64Url(size: number): string {
-    return base64url(crypto.randomBytes(size));
 }
