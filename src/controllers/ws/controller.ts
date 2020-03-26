@@ -7,11 +7,11 @@ export default class HostController {
     private  wss: WSControl;
     private onIncomingMessage: Function = undefined;
     
-    constructor (host: string, handler: Function){
-        this.wss = new WSControl(host, this.checkIncomingMessage.bind(this));
+    constructor ({ host, handler }: { host: string; handler: Function; }){
+        this.wss = new WSControl({ host, handler: this.checkIncomingMessage.bind(this) });
         this.onIncomingMessage = handler;
     }
-    
+     
     public checkIncomingMessage(msg: any) {
         let respond: any = validationJSON(msg);
             respond = this.handledIncomingData(respond);

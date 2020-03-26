@@ -14,7 +14,7 @@ export class THost {
 
     constructor (host: string) {
         this.URL = host;
-        this.host = new HostController(host, this.decodeCommand.bind(this));
+        this.host = new HostController({host, handler: this.decodeCommand.bind(this)});
     }
 
     //сервер передаёт подтверждения о выполненных командах

@@ -9,7 +9,7 @@ export default class WSControl {
     private hostState: boolean = false;
     private onIncomingMessage: handler;
 
-    constructor (host: string, handler: handler){
+    constructor ({ host, handler }: { host: string; handler: handler; }){
         this.host = host;
         this.onIncomingMessage = handler;
         this.initSocket();
