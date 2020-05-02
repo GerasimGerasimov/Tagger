@@ -29,6 +29,12 @@ export default class Tagger {
         }
     }
    
+    //TODO выдать инфу о всех устройствах в конфигурации
+    //всё есть в TDevices {public DevicesMap 
+    public static getDevicesInfo(request: Object): any {
+        return Tagger.Devices.getDevicesInfo();
+    }
+
     private static fillRespond(SlotsDataRequest :TSlotsDataRequest, host:THost): any {
         const FieldBus: TFieldBus = SlotsDataRequest.AddressableDevice.FieldBus;
         const PositionName = SlotsDataRequest.PositionName;

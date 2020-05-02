@@ -24,7 +24,6 @@ interface IScale {
 }
 
 export interface IModelDevice {
-    name: string;//название устройства (имя файла ini)
     ID: string;//строка идентификации
     Description: string;//описание
     ram:   TParameters;
@@ -38,20 +37,12 @@ type NewType = Map<string, IModelDevice>;
 export function getDevicesTagsMap(DevicesFilesProps:Array<utils.IDirСontents>): NewType {
   const result = new  Map<string, IModelDevice>();
   DevicesFilesProps.forEach(item => {
-      result.set(item.FileName, getDeviceFromFile(item.FileName, item.Content));
+      result.set(item.FileName, getDeviceFromFile(item.Content));
   })
   return result;
 }
 
-export function getDevicesTags(DevicesFilesProps:Array<utils.IDirСontents>): Array<IModelDevice> {
-  const result: Array<IModelDevice> = [];
-  DevicesFilesProps.forEach(item => {
-      result.push(getDeviceFromFile(item.FileName, item.Content))
-  })
-  return result;
-}
-
-export function getDeviceFromFile(name: string, content: any): IModelDevice {
+export function getDeviceFromFile(content: any): IModelDevice {
   content = ini.loadLinesFromBuffer(content);
   //ID
   const IDList: Array<string> = ini.getSectionListFromBuffer('DEVICE', content);
@@ -83,7 +74,6 @@ export function getDeviceFromFile(name: string, content: any): IModelDevice {
   //надо запустить порты, запустить линк-менеджеры, заполнить слоты,
   //организовать считывание данных
   const result: IModelDevice = {
-    name,
     ID,
     Description,
     ram,
@@ -92,4 +82,8 @@ export function getDeviceFromFile(name: string, content: any): IModelDevice {
     vars
   }
   return result;
+}
+
+export function getParametersForJSON(p: TParameters): any {
+  return p.getParametersForJSON();
 }

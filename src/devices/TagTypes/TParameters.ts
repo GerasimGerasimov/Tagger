@@ -55,6 +55,11 @@ export class TParameters {
         return result;
     }
 
+    //TODO продолжить 03.04.2020
+    public getParametersForJSON(): any{
+        return {'f':'ok'}
+    }
+
     private getValueOfParameter(name:string): any {
         /*TODO если праметра нет или не создался, или не обрабатывается
         должен получать значение undefined и без единиц измерения */

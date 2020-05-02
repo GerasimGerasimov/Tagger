@@ -1,23 +1,24 @@
 import http = require('http');
 import express = require("express");
 import bodyParser = require('body-parser');
+import { IHostAPI, HostAPIFunc } from '../hostapi';
 
 const app = express();
 const jsonParser = bodyParser.json()
-
-interface getDeviceDataFunc {(request: Object): any;}
 
 export default class HttpServer{
     public https: any;
 
     private port: number;
-    private proc: getDeviceDataFunc  = undefined;
+    private getDeviceData: HostAPIFunc  = undefined;
+    private getDevicesInfo: HostAPIFunc  = undefined;
 
-    constructor (port: number, proc: getDeviceDataFunc) {
-        this.port = port;
-        this.proc = proc;
-        this.init()
-    }
+   constructor (port: number, HostAPIs: IHostAPI) {
+    this.port = port;
+    this.getDeviceData  = HostAPIs.getDeviceData;
+    this.getDevicesInfo = HostAPIs.getDevicesInfo;
+    this.init()
+}
 
     private init () {
         app.all('*', function(req, res, next) {
@@ -29,20 +30,35 @@ export default class HttpServer{
         });
 
         app.route('/v1/devices/')
-            .put   (jsonParser, [this.getDeviceTags.bind(this)]);
-        
+            .put   (jsonParser, [this.getDeviceTagsAPI.bind(this)]);
+ 
+        app.route('/v1/info/')
+            .get   (jsonParser, [this.getDevicesInfoAPI.bind(this)])
+
         this.https = http.createServer(app).listen(this.port);
     }
 
-    private async getDeviceTags (request: any, response: any) {
+    private getDeviceTagsAPI (request: any, response: any) {
             try {
-                const result = await this.proc(request.body)
-                response.json( {'status':'OK',
-                                'time': new Date().toISOString(),
-                                'data':result})
+                const data = this.getDeviceData(request.body)
+                response.json( {status:'OK',
+                                time: new Date().toISOString(),
+                                data})
             } catch (e) {
                 response.status(400).json({'status':'Error',
                                             'msg': e.message || ''})
             }
     }
+
+    private getDevicesInfoAPI (request: any, response: any) {
+        try {
+            const data = this.getDevicesInfo(request.body)
+            response.json( {status:'OK',
+                            time: new Date().toISOString(),
+                            data})
+        } catch (e) {
+            response.status(400).json({'status':'Error',
+                                        'msg': e.message || ''})
+        }
+}
 }

@@ -2,6 +2,7 @@ import * as Utils from '../utils/utils';
 import * as device from './ModelDevice';
 import TTagsSource from './TTagsSource';
 import {TFieldBus} from '../fieldbus/TFieldBus';
+import { getParametersForJSON } from './ModelDevice';
 
 const DevicesDir: string = Utils.getAbsDirPath('devices');
 
@@ -36,7 +37,7 @@ export class TSlotsDataRequest {
     }
     get PositionName(): string {
         return this.AddressableDevice.PositionName;
-    }    
+    }
 }
 
 export class TDevices {
@@ -70,7 +71,7 @@ export class TDevices {
         result.source = item.source;
         result.FieldBusAddr = item.addr;
         result.PositionName = name;
-        result.SlotsDescription = item.slots;    
+        result.SlotsDescription = item.slots;
         return result;
     }
 
@@ -79,6 +80,7 @@ export class TDevices {
         let o = TagsSource.Tags.get(source);
         return o;
     }
+
     //DevsTags: Array<device.IModelDevice>
     //DevicesMap: Map<string, TAddressableDevice>
     private bindTagsSourceToDevTags(TagsSource: TTagsSource){
@@ -119,5 +121,39 @@ export class TDevices {
             throw new Error (`Wrong reguest ${req}: ${e}`)
         }     
         return result
+    }
+
+    //TODO выдать инфу о всех устройствах в конфигурации
+    //всё есть в TDevices {public DevicesMap 
+    public getDevicesInfo(): any {
+        var res: any = {}
+        const info = this.DevicesMap;
+        info.forEach((value: TAddressableDevice, key: string) => {
+            res[key] = {
+                PositionName: value.PositionName,
+                Description: value.Tags.Description,
+                Slots: this.getObjectKeys(value.SlotsDescription),
+                Tags: this.extractTags(value.Tags)
+            }
+        })
+        return res;
+    }
+
+    private extractTags(tags: device.IModelDevice): any {
+        const res: any = {};
+        for (const tag in tags) {
+            if (['ID', 'Description', 'vars'].indexOf(tag) === -1) {
+                res[tag] = getParametersForJSON(tags[tag]);
+            }
+        }
+        return res;
+    }
+
+    private getObjectKeys(obj: Object): Array<string> {
+        const res: Array<string> = [];
+        for (let key in obj) {
+            res.push(key)
+        }
+        return res;
     }
 }
