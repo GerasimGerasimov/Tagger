@@ -26,6 +26,7 @@ interface IScale {
 export interface IModelDevice {
     name: string;//название устройства (имя файла ini)
     ID: string;//строка идентификации
+    Description: string;//описание
     ram:   TParameters;
     flash: TParameters;
     cd:    TParameters;
@@ -55,6 +56,7 @@ export function getDeviceFromFile(name: string, content: any): IModelDevice {
   //ID
   const IDList: Array<string> = ini.getSectionListFromBuffer('DEVICE', content);
   const ID:string = ini.getValueByKeyFromList('ID', IDList, '');
+  const Description:string = ini.getValueByKeyFromList('Description', IDList, '');
   //получаю содержимое секции [vars]
   const varsList: Array<string> = ini.getSectionListFromBuffer('vars', content);
   //преобразую [vars] в объект
@@ -83,6 +85,7 @@ export function getDeviceFromFile(name: string, content: any): IModelDevice {
   const result: IModelDevice = {
     name,
     ID,
+    Description,
     ram,
     flash,
     cd,

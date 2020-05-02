@@ -17,7 +17,7 @@ export function HexStrToFloat32 (str: string): number {
     } else return 0
 }
 
-export function HexToFloat32(num: number) {
+export function HexToFloat32(num: number): number {
     let sign = (num & 0x80000000) ? -1 : 1;
     let exponent = ((num >> 23) & 0xff) - 127;
     let mantissa = 1 + ((num & 0x7fffff) / 0x7fffff);
