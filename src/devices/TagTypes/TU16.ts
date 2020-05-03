@@ -43,6 +43,6 @@ export class TU16 extends TSignal {
         }
         this.rawData = rawData;
         let value: Number = this.rawData * this.scale;
-        this.value = `${value} ${this.msu}`;
+        this.value = `${value}`;
     }
 }

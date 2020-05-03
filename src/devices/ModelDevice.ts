@@ -30,6 +30,7 @@ export interface IModelDevice {
     flash: TParameters;
     cd:    TParameters;
     vars:  TVars;
+    pages: Array<string>;
 }
 
 type NewType = Map<string, IModelDevice>;
@@ -48,6 +49,7 @@ export function getDeviceFromFile(content: any): IModelDevice {
   const IDList: Array<string> = ini.getSectionListFromBuffer('DEVICE', content);
   const ID:string = ini.getValueByKeyFromList('ID', IDList, '');
   const Description:string = ini.getValueByKeyFromList('Description', IDList, '');
+  const pages: Array<string> = ini.getSectionListFromBuffer('PAGES', content);
   //получаю содержимое секции [vars]
   const varsList: Array<string> = ini.getSectionListFromBuffer('vars', content);
   //преобразую [vars] в объект
@@ -79,7 +81,8 @@ export function getDeviceFromFile(content: any): IModelDevice {
     ram,
     flash,
     cd,
-    vars
+    vars,
+    pages
   }
   return result;
 }

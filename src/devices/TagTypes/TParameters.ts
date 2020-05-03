@@ -1,6 +1,6 @@
 //Контейнер для параметров из RAM/FLASH/CD
 import { TVars } from './TVars'; // шкалы
-import { TSignal } from './TSignal';
+import { TSignal, ISignalInfo } from './TSignal';
 import { TBit } from './TBit';
 import { TU16 } from './TU16';
 import { TU8 } from './TU8';
@@ -55,9 +55,20 @@ export class TParameters {
         return result;
     }
 
-    //TODO продолжить 03.04.2020
     public getParametersForJSON(): any{
-        return {'f':'ok'}
+        const res: any = {}
+        this.ValuesMap.forEach((value) => {
+            let key = value.pn;
+            let {name, comment, objType, msu} = value
+            let info: ISignalInfo = {
+                name,
+                comment,
+                objType,
+                msu
+            };
+            res[key] = info;
+        })
+        return res;
     }
 
     private getValueOfParameter(name:string): any {

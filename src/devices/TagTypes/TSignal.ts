@@ -7,6 +7,19 @@ import { StrToFloat} from '../../utils/miscel'
 //advanced
 //  s   [0]    [1]       [2]     [3]  [4]      [5]       [6]     [7]      [8]         [9]   [10]
 //WORD=name/comments/objecttype/addr/mbreg/measure unit/scale/bytesize/IndepValueName/IC/BaseConst/
+export interface ISignalInfo {
+    name: string;//имя тега, напр-р Iexc
+    comment: string;//краткое описание тега "ток возбуждения"
+    objType: string;//тип объекта сигнала
+    msu: string;//единицы измерения "А"
+}
+
+export class TSignalInfo implements ISignalInfo{
+    public name: string = '';//имя тега, напр-р Iexc
+    public comment: string = '';//краткое описание тега "ток возбуждения"
+    public objType: string = 'TSignal';//тип объекта сигнала
+    public msu: string ='';//единицы измерения "А"
+}
 
 export class TSignal {
     //общая часть

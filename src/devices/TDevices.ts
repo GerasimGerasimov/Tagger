@@ -132,6 +132,7 @@ export class TDevices {
             res[key] = {
                 PositionName: value.PositionName,
                 Description: value.Tags.Description,
+                Pages: value.Tags.pages,
                 Slots: this.getObjectKeys(value.SlotsDescription),
                 Tags: this.extractTags(value.Tags)
             }
@@ -142,7 +143,7 @@ export class TDevices {
     private extractTags(tags: device.IModelDevice): any {
         const res: any = {};
         for (const tag in tags) {
-            if (['ID', 'Description', 'vars'].indexOf(tag) === -1) {
+            if (['ID', 'Description', 'vars','pages'].indexOf(tag) === -1) {
                 res[tag] = getParametersForJSON(tags[tag]);
             }
         }

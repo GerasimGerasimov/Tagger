@@ -51,6 +51,6 @@ export class TF32 extends TSignal {
         }
         this.rawData =  HexToFloat32(rawDataHi << 16 | rawDataLo);
         let value: Number = (this.rawData - this.signOffset) * this.scale;
-        this.value = `${value} ${this.msu}`;
+        this.value = `${value}`;
     }
 }

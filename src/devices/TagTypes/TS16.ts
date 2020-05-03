@@ -55,6 +55,6 @@ export class TS16 extends TSignal {
                         ? rawData - 0x10000
                         : rawData;
         let value: Number = (this.rawData - this.signOffset) * this.scale;
-        this.value = `${value} ${this.msu}`;
+        this.value = `${value}`;
     }
 }
