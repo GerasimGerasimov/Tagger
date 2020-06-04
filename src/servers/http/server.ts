@@ -12,11 +12,13 @@ export default class HttpServer{
     private port: number;
     private getDeviceData: HostAPIFunc  = undefined;
     private getDevicesInfo: HostAPIFunc  = undefined;
+    private setDeviceParameters: HostAPIFunc  = undefined;
 
    constructor (port: number, HostAPIs: IHostAPI) {
     this.port = port;
     this.getDeviceData  = HostAPIs.getDeviceData;
     this.getDevicesInfo = HostAPIs.getDevicesInfo;
+    this.setDeviceParameters = HostAPIs.setDeviceParameters;
     this.init()
 }
 
@@ -30,7 +32,8 @@ export default class HttpServer{
         });
 
         app.route('/v1/devices/')
-            .put   (jsonParser, [this.getDeviceTagsAPI.bind(this)]);
+            .put   (jsonParser, [this.getDeviceTagsAPI.bind(this)])
+            .patch (jsonParser, [this.setDeviceParametersAPI.bind(this)]);
  
         app.route('/v1/info/')
             .get   (jsonParser, [this.getDevicesInfoAPI.bind(this)])
@@ -60,5 +63,17 @@ export default class HttpServer{
             response.status(400).json({'status':'Error',
                                         'msg': e.message || ''})
         }
-}
+    }
+
+    private setDeviceParametersAPI(request: any, response: any){
+        try {
+            const data = this.setDeviceParameters(request.body)
+            response.json( {status:'OK',
+                            time: new Date().toISOString(),
+                            data})
+        } catch (e) {
+            response.status(400).json({'status':'Error',
+                                        'msg': e.message || ''})
+        }
+    }
 }

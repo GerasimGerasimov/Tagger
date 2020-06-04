@@ -16,7 +16,8 @@ initSlotSets(Hosts, Devices);
 
 const HostAPIs: IHostAPI  = {
     getDeviceData: Tagger.getDeviceData,
-    getDevicesInfo: Tagger.getDevicesInfo
+    getDevicesInfo: Tagger.getDevicesInfo,
+    setDeviceParameters: Tagger.setDeviceParameters
   }
 
 const Server: HttpServer = new HttpServer(5004, HostAPIs);

@@ -28,13 +28,26 @@ export default class Tagger {
             return ErrorMessage(e.message)
         }
     }
-   
-    //TODO выдать инфу о всех устройствах в конфигурации
-    //всё есть в TDevices {public DevicesMap 
+  
     public static getDevicesInfo(request: Object): any {
         return Tagger.Devices.getDevicesInfo();
     }
 
+    /*TODO записать новые значения выбранным параметрам
+    1) Передаю объект с указанием:
+        {
+        "U1":{  - Устройства
+            "RAM":[ - Сектора памяти
+                "DIN.0(C1_AC)=1", - Имени параметра и его новое значение
+                "Iexc=100",
+                "Fz=0.98"
+            ]
+        }
+    */
+    public static setDeviceParameters(request: Object): any {
+        return Tagger.Devices.getDevicesInfo();
+    }
+    
     private static fillRespond(SlotsDataRequest :TSlotsDataRequest, host:THost): any {
         const FieldBus: TFieldBus = SlotsDataRequest.AddressableDevice.FieldBus;
         const PositionName = SlotsDataRequest.PositionName;

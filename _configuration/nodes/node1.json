@@ -1,0 +1,7 @@
+{
+    "name":"node1",
+    "HOST":{
+        "url": "http://localhost:5001"
+    },
+    "fieldbus":"ModbusRTU"
+}
