@@ -39,6 +39,11 @@ export abstract class TFieldBus {
         return result;
     }
 
+    public createWriteSlot(PositionName: string, Source: TSlotSource, regsValues: Map<string, any>):  TSlotSet {
+        let result: TSlotSet;
+        return result;
+    }
+
     public checkHeaderOfAnswer(slot:TSlot) {
     }
 

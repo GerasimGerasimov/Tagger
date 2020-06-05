@@ -1,5 +1,5 @@
-import {TFieldBus} from '../fieldbus/TFieldBus'
-import {TSlot, TDeviceAnswer} from '../slots/TSlotSet'
+import {TFieldBus, TSlotSource} from '../fieldbus/TFieldBus'
+import {TSlot, TDeviceAnswer, TSlotSet} from '../slots/TSlotSet'
 
 import {THosts} from '../client/THosts';
 import {THost} from '../client/THost';
@@ -47,7 +47,7 @@ export default class Tagger {
     public static setDeviceParameter(request: Object): any | Error {
         //1) выделить что и куда передавать
         const device:  TSlotsDataRequest = Tagger.Devices.getSlotsDataRequest(request);
-        const {host, FieldBusAddr, PositionName} = device.AddressableDevice;
+        const {host, FieldBus, FieldBusAddr, PositionName} = device.AddressableDevice;
         const {SectionName, Request} = device.SlotDataRequest[0];
         device.AddressableDevice.isSection(SectionName);
         //из Request достать параметр который надо поменять.
@@ -55,8 +55,19 @@ export default class Tagger {
         //так как сейчас я обрабатываю ввод клавиатуры, а это один изменённый параметр
         //TODO потом подумаю как обрабатывать несколько параметров, 
         //     самый тупой подход - это одна команда записи на один параметр
-        var {tag, value} = Tagger.getTagAndValue(Request);
-        device.AddressableDevice.isTag(SectionName, tag)
+        const {key: tag, value} = Tagger.getKeyAndValueOnce(Request);
+        const values: Map<string, any> = new Map();
+        values.set(tag, value);
+        device.AddressableDevice.isTag(SectionName, tag);
+        //2) Создать запрос для размещения в слот
+        try {
+            const SlotSourceKey: string = `${PositionName}:${SectionName}`;
+            const SlotSource: TSlotSource = device.AddressableDevice.SlotsDescription[SlotSourceKey];
+            const SlotSet:TSlotSet = FieldBus.createWriteSlot(PositionName, SlotSource, values);
+            //Host.addSlotSetToMap(SlotSet);
+        } catch (e) {
+            console.log(e)
+        }
     
         const respond = {
             host,
@@ -69,14 +80,16 @@ export default class Tagger {
         return respond;
     }
     
-    private static getTagAndValue(req: any): {tag: string; value: any;} {
-        var tag: string = '';
+    private 
+
+    private static getKeyAndValueOnce(req: any): {key: string; value: any;} {
+        var key: string = '';
         var value: any = 0;
-        for (tag in Request) {
-            value = Request[tag]
+        for (key in req) {
+            value = req[key]
             break;
         }
-        return {tag, value}
+        return {key, value}
     }
 
     private static fillRespond(SlotsDataRequest :TSlotsDataRequest, host:THost): any {

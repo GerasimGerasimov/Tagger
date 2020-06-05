@@ -9,6 +9,30 @@ export class TFieldBusModbusRTU extends TFieldBus {
         super();
     }
 
+    public createWriteSlot(PositionName: string, Source: TSlotSource,  tagsValues: Map<string, any>):  TSlotSet {
+        let range: TRegsRange = undefined;
+        let tags: TParameters = this.Tags[Source.section.toLowerCase()];
+        range = this.getWriteRegsRange(Source.range, tags, tagsValues);
+        const result = new TSlotSet();
+        const values = this.getRegsHexValueFromTagValue(tagsValues, tags)
+        result.cmd = Array.from(this.createWriteCommand(range, values));
+        result.interval = Source.interval;
+        result.NotRespond = Source.NotRespond;
+        result.TimeOut = Source.TimeOut.read;
+        result.ID = `${PositionName}:${Source.section}`;
+        result.RegsRange = range;
+        result.commandType = TCommadType.ReadMultiplayRegisters;
+        return result;
+    }
+
+    private getRegsHexValueFromTagValue(tagsValues: Map<string, any>, tags: TParameters): Uint16Array {
+        return new Uint16Array(0)
+    }
+
+    private getWriteRegsRange(range: any, tags: TParameters, tagsValues: Map<string, any>): TRegsRange {
+        return new TRegsRange();
+    }
+
     public createReadSlot(PositionName: string, Source: TSlotSource):  TSlotSet {
         let range: TRegsRange = undefined;
         let tags: TParameters = this.Tags[Source.section.toLowerCase()];
@@ -111,13 +135,13 @@ export class TFieldBusModbusRTU extends TFieldBus {
         }
         return undefined;
     } 
-    /* Сборка команды чтения нескольких регистров
-    формат: AD,C,R(h,l),Cnt(h,l),CRC(h,l)
-             │ │  │       │        └─ (word)crc16
-             │ │  │       └────────── (word)Кол-во регистров
-             │ │  └────────────────── (word)Начальный адрес
-             │ └───────────────────── (byte)Команда (03h)
-             └─────────────────────── (byte)Адрес устройства
+    /* Сборка команды чтения нескольких регистров. формат:
+    AD,C,R(h,l),Cnt(h,l),CRC(h,l)
+     │ │  │       │        └─ (word)crc16
+     │ │  │       └────────── (word)Кол-во регистров
+     │ │  └────────────────── (word)Начальный адрес
+     │ └───────────────────── (byte)Команда (03h)
+     └─────────────────────── (byte)Адрес устройства
     */
     private createReadCommand(range: TRegsRange): Uint8Array {
         const FieldBusAddr: number = this.FieldBusAddr;
@@ -127,7 +151,31 @@ export class TFieldBusModbusRTU extends TFieldBus {
         return appendCRC16toArray(cmdSource);
     }
 
-    public checkHeaderOfAnswer(slot: TSlot){
+    /* Cборка команды записи последовательности регистров. Формат:
+    AD,C,№R(h,l),CW(h,l),CntBytes,Data[0](h,l)..Data[CW](h,l),CRC(h,l)
+     │ │  │       │          │     │             │             └─ (word)crc16
+     │ │  │       │          │     └─────────────┴─ (word)Записываемые данные
+     │ │  │       │          └─ (byte)Кол-во передаваемых байт
+     │ │  │       └─ (word)Кол-во регистров к передаче
+     │ │  └─ (word)Начальный адрес
+     │ └──── (byte)Команда (10h)
+     └────── (byte)Адрес устройства
+    */
+    private createWriteCommand(range: TRegsRange, regsValues: Uint16Array): Uint8Array {
+        const FieldBusAddr: number = this.FieldBusAddr;
+        const values = this.swapU16ArrayToU8(regsValues);
+        const cmdSource = new Uint8Array([
+            FieldBusAddr,
+            0x10,
+            range.first >> 8, range.first & 0xFF,
+            range.count >> 8, range.count & 0xFF,
+            range.count * 2,
+            ... values
+        ]);
+        return appendCRC16toArray(cmdSource);
+    }
+
+    public checkHeaderOfAnswer(slot: TSlot): void | Error{
         if (slot.status == 'Error') throw new Error(slot.msg)
         //контрольная сумма
         if (getCRC16(Uint8Array.from(slot.msg))) throw new Error (`TFieldBus CRC Error`);
@@ -163,6 +211,7 @@ export class TFieldBusModbusRTU extends TFieldBus {
         if (requiredRegsNum != inputRegNum) 
             (`TFieldBus Device Regs Numbers Error: ${requiredRegsNum} regs expected, but ${inputRegNum} returned`);
     }
+
     /*удалить протокольные байты и сделать swap байтов
     формат: AD,C,BCNT,DATA[swapped u16],CRC(h,l)
              │ │  │       │              └─ (word)crc16
@@ -185,6 +234,20 @@ export class TFieldBusModbusRTU extends TFieldBus {
         while (i--) {
             let reg: number = (source[sourceIdx+0] << 8 | source[sourceIdx+1]);
             result[destIdx ++] =  reg;
+            sourceIdx +=2;
+        }
+        return result;
+    }
+
+    private swapU16ArrayToU8(source: Uint16Array): Uint8Array {
+        let destIdx: number = 0;
+        let sourceIdx: number = 0;
+        let i: number = source.length * 2;
+        const result = new Uint8Array(i);
+        while (i--) {
+            let reg: number = source[sourceIdx];
+            result[destIdx  ] = (reg >> 8) & 0x00FF;
+            result[destIdx++] = reg & 0x00FF;
             sourceIdx +=2;
         }
         return result;
