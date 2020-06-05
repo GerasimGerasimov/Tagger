@@ -31,8 +31,8 @@ export class TParameters {
         const result = {};
         request.forEach((item: string)=>{
             result[item] = this.getValueOfParameter(item);
-        });  
-        return result;      
+        });
+        return result;
     }
 
     public getRequiredParameters(request: Array<string>): Object{
@@ -69,6 +69,12 @@ export class TParameters {
             res[key] = info;
         })
         return res;
+    }
+
+    public isTag(tag: string): void | Error {
+        if (this.ValuesMap.get(tag) === undefined) {
+            throw new Error (`Tag ${tag} doesn't exist in Tags`);
+        }
     }
 
     private getValueOfParameter(name:string): any {

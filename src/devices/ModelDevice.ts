@@ -35,6 +35,18 @@ export interface IModelDevice {
 
 type NewType = Map<string, IModelDevice>;
 
+export function isSection(SectionName: string, Tags: IModelDevice): void | Error {
+  const tags: TParameters = Tags[SectionName.toLowerCase()];
+  if (tags === undefined) {
+    throw new Error (`Section ${SectionName} doesn't exist in Tags`);
+  }
+}
+
+export function isTag(SectionName: string, Tags: IModelDevice, Tag: string): void | Error {
+  const tags: TParameters = Tags[SectionName.toLowerCase()];
+  tags.isTag(Tag);
+}
+
 export function getDevicesTagsMap(DevicesFilesProps:Array<utils.IDirСontents>): NewType {
   const result = new  Map<string, IModelDevice>();
   DevicesFilesProps.forEach(item => {

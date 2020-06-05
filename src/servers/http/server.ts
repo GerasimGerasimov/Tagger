@@ -12,13 +12,13 @@ export default class HttpServer{
     private port: number;
     private getDeviceData: HostAPIFunc  = undefined;
     private getDevicesInfo: HostAPIFunc  = undefined;
-    private setDeviceParameters: HostAPIFunc  = undefined;
+    private setDeviceParameter: HostAPIFunc  = undefined;
 
    constructor (port: number, HostAPIs: IHostAPI) {
     this.port = port;
     this.getDeviceData  = HostAPIs.getDeviceData;
     this.getDevicesInfo = HostAPIs.getDevicesInfo;
-    this.setDeviceParameters = HostAPIs.setDeviceParameters;
+    this.setDeviceParameter = HostAPIs.setDeviceParameter;
     this.init()
 }
 
@@ -67,7 +67,7 @@ export default class HttpServer{
 
     private setDeviceParametersAPI(request: any, response: any){
         try {
-            const data = this.setDeviceParameters(request.body)
+            const data = this.setDeviceParameter(request.body)
             response.json( {status:'OK',
                             time: new Date().toISOString(),
                             data})

@@ -44,10 +44,41 @@ export default class Tagger {
             ]
         }
     */
-    public static setDeviceParameters(request: Object): any {
-        return Tagger.Devices.setDeviceParameters(request);
+    public static setDeviceParameter(request: Object): any | Error {
+        //1) выделить что и куда передавать
+        const device:  TSlotsDataRequest = Tagger.Devices.getSlotsDataRequest(request);
+        const {host, FieldBusAddr, PositionName} = device.AddressableDevice;
+        const {SectionName, Request} = device.SlotDataRequest[0];
+        device.AddressableDevice.isSection(SectionName);
+        //из Request достать параметр который надо поменять.
+        //Это объект отбъектов, но интересует только один параметров
+        //так как сейчас я обрабатываю ввод клавиатуры, а это один изменённый параметр
+        //TODO потом подумаю как обрабатывать несколько параметров, 
+        //     самый тупой подход - это одна команда записи на один параметр
+        var {tag, value} = Tagger.getTagAndValue(Request);
+        device.AddressableDevice.isTag(SectionName, tag)
+    
+        const respond = {
+            host,
+            PositionName,
+            SectionName,
+            FieldBusAddr,
+            tag,
+            value
+        }
+        return respond;
     }
     
+    private static getTagAndValue(req: any): {tag: string; value: any;} {
+        var tag: string = '';
+        var value: any = 0;
+        for (tag in Request) {
+            value = Request[tag]
+            break;
+        }
+        return {tag, value}
+    }
+
     private static fillRespond(SlotsDataRequest :TSlotsDataRequest, host:THost): any {
         const FieldBus: TFieldBus = SlotsDataRequest.AddressableDevice.FieldBus;
         const PositionName = SlotsDataRequest.PositionName;

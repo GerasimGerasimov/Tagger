@@ -2,7 +2,7 @@ import * as Utils from '../utils/utils';
 import * as device from './ModelDevice';
 import TTagsSource from './TTagsSource';
 import {TFieldBus} from '../fieldbus/TFieldBus';
-import { getParametersForJSON } from './ModelDevice';
+import { getParametersForJSON, isTag, isSection } from './ModelDevice';
 
 const DevicesDir: string = Utils.getAbsDirPath('devices');
 
@@ -21,6 +21,14 @@ export class TAddressableDevice {
     FieldBusAddr: number = 1;//адрес в сети или полевой шине
     Tags: device.IModelDevice = undefined;//доступные теги, требуется последующее заполнение
     SlotsDescription: Object = {};//описание слотов в JSON-формате, требуется последующая обработка
+
+    public isSection(SectionName: string){
+        isSection(SectionName, this.Tags);
+    }
+
+    public isTag(SectionName: string, Tag: string) {
+        isTag(SectionName, this.Tags, Tag);
+    }
 }
 
 export class TSlotDataRequest {
@@ -136,10 +144,6 @@ export class TDevices {
             }
         })
         return res;
-    }
-
-    public setDeviceParameters(request: Object): any {
-        return request;
     }
 
     private extractTags(tags: device.IModelDevice): any {
