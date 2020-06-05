@@ -45,7 +45,7 @@ export default class Tagger {
         }
     */
     public static setDeviceParameters(request: Object): any {
-        return Tagger.Devices.getDevicesInfo();
+        return Tagger.Devices.setDeviceParameters(request);
     }
     
     private static fillRespond(SlotsDataRequest :TSlotsDataRequest, host:THost): any {

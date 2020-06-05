@@ -123,8 +123,6 @@ export class TDevices {
         return result
     }
 
-    //TODO выдать инфу о всех устройствах в конфигурации
-    //всё есть в TDevices {public DevicesMap 
     public getDevicesInfo(): any {
         var res: any = {}
         const info = this.DevicesMap;
@@ -138,6 +136,10 @@ export class TDevices {
             }
         })
         return res;
+    }
+
+    public setDeviceParameters(request: Object): any {
+        return request;
     }
 
     private extractTags(tags: device.IModelDevice): any {
