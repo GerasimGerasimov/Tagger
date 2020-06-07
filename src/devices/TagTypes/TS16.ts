@@ -57,4 +57,8 @@ export class TS16 extends TSignal {
         let value: Number = (this.rawData - this.signOffset) * this.scale;
         this.value = `${value}`;
     }
+
+    public convertValueToRAW(value: string | number): number {
+        return ((Number(value) / this.scale)+this.signOffset) || 0; 
+    }
 }

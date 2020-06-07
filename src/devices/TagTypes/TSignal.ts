@@ -78,5 +78,9 @@ export class TSignal {
     public setDataToParameter(data: Map<number, any>){
 
     }
+
+    public convertValueToRAW(value: string | number): number {
+        return (Number(value) / this.scale) || 0; 
+    }
   }
   

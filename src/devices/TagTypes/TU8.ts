@@ -1,6 +1,7 @@
 import { TVars } from './TVars'; // шкалы
 import { TSignal } from './TSignal';
 import { StrToFloat} from '../../utils/miscel'
+import { raw } from 'body-parser';
 
 //typical
 //  s   [0]    [1]       [2]     [3]  [4]      [5]       [6]     [7]      [8]
@@ -40,4 +41,17 @@ export class TU8 extends TSignal {
         this.scale = vars.getScale(this.scaleStr);
     }
     
+    public convertValueToRAW(value: string | number): number {
+        var raw: number = (Number(value) / this.scale) || 0;
+        var data: number = this.rawData;
+        switch (this.regOffs as any) {
+            case 'L':
+                data = data | (raw & 0xFF)
+                break;
+            case 'H':
+                data = data | ((raw << 8) & 0xFF00)
+                break;
+        }
+        return data;
+    }
 }

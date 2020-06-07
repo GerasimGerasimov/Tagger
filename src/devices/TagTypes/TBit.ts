@@ -29,4 +29,11 @@ export class TBit extends TSignal {
         let value: Number = (this.rawData != 0)? 1 : 0;
         this.value = `${value}`;
     }
+
+    public convertValueToRAW(value: string | number): number {
+        var mask = 1 << this.mask;
+        return (Number(value) !== 0)
+            ? this.rawData | mask
+            : this.rawData & (~mask)
+    }
 }

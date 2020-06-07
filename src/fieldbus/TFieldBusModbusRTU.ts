@@ -10,23 +10,46 @@ export class TFieldBusModbusRTU extends TFieldBus {
     }
 
     public createWriteSlot(PositionName: string, Source: TSlotSource,  tagsValues: Map<string, any>):  TSlotSet {
-        let range: TRegsRange = undefined;
         let tags: TParameters = this.Tags[Source.section.toLowerCase()];
-        range = this.getWriteRegsRange(Source.range, tags, tagsValues);
+        let range: TRegsRange = this.getRegsRange(Array.from(tagsValues.keys()), tags);
         const result = new TSlotSet();
-        const values = this.getRegsHexValueFromTagValue(tagsValues, tags)
+        //TODO сделать цикл чтения слотов для обновления TSignal.rawData
+        const values = this.getRegsRawValueFromTagValue(tagsValues, tags)
         result.cmd = Array.from(this.createWriteCommand(range, values));
         result.interval = Source.interval;
         result.NotRespond = Source.NotRespond;
-        result.TimeOut = Source.TimeOut.read;
+        result.TimeOut = Source.TimeOut.write;
+        //TODO создать уникальный ID так как это временный слот
         result.ID = `${PositionName}:${Source.section}`;
         result.RegsRange = range;
-        result.commandType = TCommadType.ReadMultiplayRegisters;
+        result.commandType = TCommadType.WriteMultiplayRegisters;
         return result;
     }
 
-    private getRegsHexValueFromTagValue(tagsValues: Map<string, any>, tags: TParameters): Uint16Array {
-        return new Uint16Array(0)
+    //преобразовать введённые данные
+    private getRegsRawValueFromTagValue(tagsValues: Map<string, any>, tags: TParameters): Uint16Array {
+        const regsValues: Array<number> = [];
+        //физ значения из values надо превратить в hex
+        tagsValues.forEach((value, tag)=>{
+            const signal:TSignal = tags.valuesMap.get(tag);
+            const raw = signal.convertValueToRAW(value);
+            const {bytes} = signal;//размер параметра в байтах
+            //в зависимости от кол-ва байт параметра, разбить его на регистры
+            switch (bytes) {
+                case 1:
+                case 2:
+                    //TODO проверить действия с TBit
+                    //TODO проверить действия с данными в 1 байт
+                    regsValues.push(raw)
+                    break;
+                case 4:
+                    regsValues.push(raw         & 0x0000FFFF)//LO
+                    regsValues.push((raw >> 16) & 0x0000FFFF)//HI
+                    break;
+            }
+            console.log(tag, raw);
+        })
+        return new Uint16Array(regsValues)
     }
 
     private getWriteRegsRange(range: any, tags: TParameters, tagsValues: Map<string, any>): TRegsRange {

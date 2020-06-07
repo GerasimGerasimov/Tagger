@@ -42,7 +42,11 @@ export class TU16 extends TSignal {
             return;
         }
         this.rawData = rawData;
-        let value: Number = this.rawData * this.scale;
+        let value: number = this.rawData * this.scale;
         this.value = `${value}`;
+    }
+
+    public convertValueToRAW(value: string | number): number {
+        return (Number(value) / this.scale) || 0; 
     }
 }

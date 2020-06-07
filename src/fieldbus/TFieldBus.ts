@@ -9,7 +9,7 @@ class TTimeOut {
 export class TSlotSource {
     interval: number = 1000;
     NotRespond: boolean =  false;
-    range: any; //String = all //Object = {from: "p06402", to: "p08700"}
+    range: any; //String = all //Object = {from: "Ixec", to: "Uexc"}
     section: string = "RAM";
     TimeOut: TTimeOut  = {
         read: 100,
