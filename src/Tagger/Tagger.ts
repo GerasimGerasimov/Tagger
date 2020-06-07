@@ -33,7 +33,7 @@ export default class Tagger {
         return Tagger.Devices.getDevicesInfo();
     }
 
-    /*TODO записать новые значения выбранным параметрам
+    /*Записать новые значения выбранным параметрам
     1) Передаю объект с указанием:
         {
         "U1":{  - Устройства
@@ -64,7 +64,10 @@ export default class Tagger {
             const SlotSourceKey: string = `${PositionName}:${SectionName}`;
             const SlotSource: TSlotSource = device.AddressableDevice.SlotsDescription[SlotSourceKey];
             const SlotSet:TSlotSet = FieldBus.createWriteSlot(PositionName, SlotSource, values);
-            //Host.addSlotSetToMap(SlotSet);
+            const Host:THost = Tagger.Hosts.getHostByName(host);
+            const Slot:TSlot = Host.addSlotSetToMap(SlotSet);
+            Host.setSlotToHost(Slot)//async
+            //TODO дождаться записи и удалить слот
         } catch (e) {
             console.log(e)
         }
@@ -79,8 +82,6 @@ export default class Tagger {
         }
         return respond;
     }
-    
-    private 
 
     private static getKeyAndValueOnce(req: any): {key: string; value: any;} {
         var key: string = '';

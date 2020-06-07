@@ -70,11 +70,12 @@ export class THost {
         console.log(`${msg.result}`)
     }
 
-    public addSlotSetToMap(SlotSet: TSlotSet){
+    public addSlotSetToMap(SlotSet: TSlotSet):TSlot{
         const Slot = new TSlot();
         Slot.status = 'Error'; //статус Error - нельзя верить данным
         Slot.slotSet = SlotSet;
-        this.SlotsMap.set(SlotSet.ID, Slot)
+        this.SlotsMap.set(SlotSet.ID, Slot);
+        return Slot;
     }
 
     //передам СлотСеты реальному хосту используя API PUT /v1/slots/
@@ -92,4 +93,16 @@ export class THost {
         }
     }
     
+    //передам Слот реальному хосту используя API PUT /v1/slots/
+    public async setSlotToHost(slot: TSlot){
+        try {
+            await this.host.putSlotSetToHost(this.URL, slot.slotSet);
+            slot.status = 'SlotSet added';
+            slot.msg = '';
+        } catch (e) {
+            console.log(e);
+            slot.status = 'Error';
+            slot.msg = e;
+        }
+    }
 }

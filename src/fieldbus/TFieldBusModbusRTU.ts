@@ -3,6 +3,7 @@ import {TSlotSet, TSlot, TRegsRange, TCommadType} from '../slots/TSlotSet'
 import {TParameters} from '../devices/TagTypes/TParameters'
 import { TSignal } from '../devices/TagTypes/TSignal';
 import {getCRC16, appendCRC16toArray} from './crc/crc16'
+import { randomStringAsBase64Url } from '../utils/cryputils';
 
 export class TFieldBusModbusRTU extends TFieldBus {
     constructor (){
@@ -13,14 +14,15 @@ export class TFieldBusModbusRTU extends TFieldBus {
         let tags: TParameters = this.Tags[Source.section.toLowerCase()];
         let range: TRegsRange = this.getRegsRange(Array.from(tagsValues.keys()), tags);
         const result = new TSlotSet();
-        //TODO сделать цикл чтения слотов для обновления TSignal.rawData
+        //TODO перед записью прочитать слот для обновления TSignal.rawData
         const values = this.getRegsRawValueFromTagValue(tagsValues, tags)
         result.cmd = Array.from(this.createWriteCommand(range, values));
         result.interval = Source.interval;
         result.NotRespond = Source.NotRespond;
         result.TimeOut = Source.TimeOut.write;
-        //TODO создать уникальный ID так как это временный слот
-        result.ID = `${PositionName}:${Source.section}`;
+        //создать уникальный ID так как это временный слот
+        const ID: string = randomStringAsBase64Url(4);
+        result.ID = `${PositionName}:${ID}`;
         result.RegsRange = range;
         result.commandType = TCommadType.WriteMultiplayRegisters;
         return result;
@@ -265,11 +267,11 @@ export class TFieldBusModbusRTU extends TFieldBus {
     private swapU16ArrayToU8(source: Uint16Array): Uint8Array {
         let destIdx: number = 0;
         let sourceIdx: number = 0;
-        let i: number = source.length * 2;
-        const result = new Uint8Array(i);
+        let i: number = source.length;
+        const result = new Uint8Array(source.length * 2);
         while (i--) {
             let reg: number = source[sourceIdx];
-            result[destIdx  ] = (reg >> 8) & 0x00FF;
+            result[destIdx++] = (reg >> 8) & 0x00FF;
             result[destIdx++] = reg & 0x00FF;
             sourceIdx +=2;
         }
