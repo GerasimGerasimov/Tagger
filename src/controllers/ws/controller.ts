@@ -45,6 +45,21 @@ export default class HostController {
         }
     }
 
+    public async deleteSlotFromHost(host: string, SlotID: string): Promise<any | IErrorMessage> {
+        try {
+            await this.wss.send({delete:SlotID})
+            return {
+                cmd:'delete',
+                status:'OK',
+                time: new Date().toISOString(),
+                result:`Slot ID:${SlotID} deleted`,
+                ID:  SlotID};
+        } catch (e) {
+            console.log(e);
+            throw new Error (`Fetch Error: ${e.message}`);
+        }
+    }
+
     public async getSlotDataByID(host: string, ID: string):Promise<any | IErrorMessage> {
         try {
             const payload: string = JSON.stringify({get:ID});

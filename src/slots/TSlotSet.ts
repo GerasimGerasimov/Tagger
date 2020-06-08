@@ -5,12 +5,18 @@ export class TDeviceAnswer {
     data:Object;
 }
 
+interface ISlotCallBack {
+    (Slot:TSlot): any;
+}
+
 export class TSlot {
     status: string = ''
     msg: any;
     slotSet: TSlotSet = undefined;
     time?: string;//время последнего валидного обновления данных 
     duration: number;//время выполнения запроса
+    onFulfilled?: ISlotCallBack = undefined;//слот выполнился успешно
+    onRejected?: ISlotCallBack = undefined;//слот завершился неудачно
 }
 
 export class TSlotSet {

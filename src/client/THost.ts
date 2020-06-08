@@ -41,13 +41,22 @@ export class THost {
                     }};
     */
     private deliveredSlotData(msg: any) {
+        var Slot:TSlot = undefined;
         try {
             const SlotID: string = this.getSlotID(msg);
-            console.log(`${this.count++} : ${SlotID}`);
-            let Slot: TSlot = this.SlotsMap.get(SlotID);
+            //console.log(`${this.count++} : ${SlotID}`);
+            Slot = this.SlotsMap.get(SlotID);       
             Slot = Object.assign(Slot,msg.slots[SlotID]);
+            if (Slot.onFulfilled) {
+                Slot.onFulfilled(Slot)
+            }     
         } catch (e) {
             console.log(e.msg)
+            if (Slot !== undefined) {
+                if (Slot.onRejected) {
+                    Slot.onRejected(Slot)
+                }
+            }
         }
     }
 
@@ -78,6 +87,18 @@ export class THost {
         return Slot;
     }
 
+    public deleteSlotFromMap(ID:string){
+        this.SlotsMap.delete(ID);
+    }
+
+    public async deleteSlotFromHost(ID:string){
+        try {
+            return await this.host.deleteSlotFromHost(this.URL, ID)
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
     //передам СлотСеты реальному хосту используя API PUT /v1/slots/
     public async setSlotSetsToHost(){
         for (const Slot of this.SlotsMap.values()) {
@@ -89,20 +110,26 @@ export class THost {
                 console.log(e);
                 Slot.status = 'Error';
                 Slot.msg = e;
+                if (Slot.onRejected) {
+                    Slot.onRejected(Slot)
+                }
             }
         }
     }
     
     //передам Слот реальному хосту используя API PUT /v1/slots/
-    public async setSlotToHost(slot: TSlot){
+    public async setSlotToHost(Slot: TSlot){
         try {
-            await this.host.putSlotSetToHost(this.URL, slot.slotSet);
-            slot.status = 'SlotSet added';
-            slot.msg = '';
+            await this.host.putSlotSetToHost(this.URL, Slot.slotSet);
+            Slot.status = 'SlotSet added';
+            Slot.msg = '';
         } catch (e) {
             console.log(e);
-            slot.status = 'Error';
-            slot.msg = e;
+            Slot.status = 'Error';
+            Slot.msg = e;
+            if (Slot.onRejected) {
+                Slot.onRejected(Slot)
+            }
         }
     }
 }

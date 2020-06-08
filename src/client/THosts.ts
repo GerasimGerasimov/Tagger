@@ -31,4 +31,5 @@ export class THosts {
     public getHostByName(name: string) {
         return this.HostsMap.get(name);
     }
+
 }
