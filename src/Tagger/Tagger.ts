@@ -67,10 +67,10 @@ export default class Tagger {
                 if (status === "OK") {
                     resolve({
                     tag,
-                    msg:`Tag ${tag} has written`
+                    msg:`Tag ${tag} has been written`
                 })} else {
                     reject ({
-                        msg: `Tag ${tag} hasn't written`
+                        msg: `Tag ${tag} hasn't been written`
                     })
                 }
             }
@@ -78,7 +78,7 @@ export default class Tagger {
             Slot.onRejected = function () {
                 console.log('onRejected:',Slot);
                 reject ({
-                    msg: `Tag ${tag} hasn't written`
+                    msg: `Tag ${tag} hasn't been written`
                 })
             }
         })
