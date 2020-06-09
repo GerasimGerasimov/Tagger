@@ -273,7 +273,7 @@ export class TFieldBusModbusRTU extends TFieldBus {
             let reg: number = source[sourceIdx];
             result[destIdx++] = (reg >> 8) & 0x00FF;
             result[destIdx++] = reg & 0x00FF;
-            sourceIdx +=2;
+            sourceIdx +=1;
         }
         return result;
     }

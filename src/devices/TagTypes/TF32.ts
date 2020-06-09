@@ -1,6 +1,6 @@
 import { TVars } from './TVars'; // шкалы
 import { TSignal } from './TSignal';
-import { StrToFloat, HexStrToFloat32, HexToFloat32} from '../../utils/miscel'
+import { StrToFloat, HexStrToFloat32, HexToFloat32, Float32ToU16Array} from '../../utils/miscel'
 
 //  s   [0]  [1]      [2]        [3]  [4]   [5]          [6]   [7]      [8]
 //Float=name/comments/objecttype/addr/mbreg/measure unit/scale/bytesize/ftype/
@@ -52,5 +52,12 @@ export class TF32 extends TSignal {
         this.rawData =  HexToFloat32(rawDataHi << 16 | rawDataLo);
         let value: Number = (this.rawData - this.signOffset) * this.scale;
         this.value = `${value}`;
+    }
+
+    public convertValueToRAW(value: string | number): number {
+        const newValue: number = (Number(value) / this.scale) || 0;
+        const au16: Array<number> = Float32ToU16Array(newValue);
+        var res: number = au16[1] | (au16[0] << 16);
+        return res;
     }
 }

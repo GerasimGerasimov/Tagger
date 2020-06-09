@@ -23,3 +23,10 @@ export function HexToFloat32(num: number): number {
     let mantissa = 1 + ((num & 0x7fffff) / 0x7fffff);
     return sign * mantissa * Math.pow(2, exponent);
 }
+
+export function Float32ToU16Array (float32: number): Array<number> {
+    var view = new DataView(new ArrayBuffer(4))
+    view.setFloat32(0, float32);
+    const res: Array<number>=[view.getUint16(0), view.getUint16(2)];
+    return res;
+}
