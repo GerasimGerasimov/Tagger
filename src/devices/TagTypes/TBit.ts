@@ -25,11 +25,13 @@ export class TBit extends TSignal {
             this.value = null;
             return;
         }
-        this.rawData = rawData & ( 1 << this.mask);
-        let value: Number = (this.rawData != 0)? 1 : 0;
+        this.rawData = rawData;
+        const mask: number = rawData & ( 1 << this.mask);
+        let value: Number = (mask != 0)? 1 : 0;
         this.value = `${value}`;
     }
 
+    //TODO что-то не так с записью битов, ставлю в 0 один, так тот что был в 0 ставится в 1
     public convertValueToRAW(value: string | number): number {
         var mask = 1 << this.mask;
         return (Number(value) !== 0)
