@@ -5,7 +5,7 @@
     "slots":{
         "U2:FLASH": {
             "section":"FLASH",
-            "range":["COM4_ADR","REG3K"],
+            "range":"ALL",
             "TimeOut": {
                 "read": 500,
                 "write": 500

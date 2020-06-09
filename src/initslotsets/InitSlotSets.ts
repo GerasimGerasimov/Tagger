@@ -12,9 +12,10 @@ export function initSlotSets(Hosts: THosts, Devices: TDevices) {
 
 function createSlotSets(hosts: THosts, devices: TDevices) {
     hosts.HostsMap.forEach((Host:THost) => {
-        const FieldBus:TFieldBus = new TFieldBusModbusRTU();
         devices.DevicesMap.forEach ((DeviceProperties: TAddressableDevice)=>{
+            const FieldBus:TFieldBus = new TFieldBusModbusRTU();
             DeviceProperties.FieldBus = FieldBus;//теперь знаю каким протоколом обрабатывается устройство
+            //TODO избавится от Tags в TFieldBus
             FieldBus.Tags  = DeviceProperties.Tags;
             FieldBus.FieldBusAddr = DeviceProperties.FieldBusAddr;
             for (const SlotSourceKey in DeviceProperties.SlotsDescription) {
