@@ -1,5 +1,5 @@
 {
-  "name": "link-service",
+  "name": "tagger",
   "version": "1.0.0",
   "description": "сервис связи с внешними девайсами",
   "main": "index.ts",
@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/GerasimGerasimov/SlotsService.git"
+    "url": "git+https://github.com/GerasimGerasimov/Tagger.git"
   },
   "author": "Gerasimov V. Gerasim",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/GerasimGerasimov/SlotsService/issues"
+    "url": "https://github.com/GerasimGerasimov/Tagger/issues"
   },
-  "homepage": "https://github.com/GerasimGerasimov/SlotsService#readme",
+  "homepage": "https://github.com/GerasimGerasimov/Tagger#readme",
   "devDependencies": {
     "@types/body-parser": "^1.17.0",
     "@types/express": "^4.17.0",
