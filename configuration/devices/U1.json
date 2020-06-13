@@ -13,6 +13,16 @@
             "NotRespond": false,
             "interval":0
         },
+        "U1:CD": {
+            "section":"CD",
+            "range":"all",
+            "TimeOut": {
+                "read": 500,
+                "write": 1000
+            },
+            "NotRespond": false,
+            "interval":1000
+        },
         "U1:FLASH": {
             "section":"FLASH",
             "range":"all",
