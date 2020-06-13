@@ -44,33 +44,61 @@ export default class Tagger {
             ]
         }
     */
-    private static async waitValueHasWritten(Slot:TSlot, tag: string): Promise<any | IErrorMessage> {
+    private static getHostBySlotID(ID:string): THost {
+        //найти к какому Хосту относится Слот
+        var Host: THost = undefined;
+        for (const host of Tagger.Hosts.HostsMap.values()) {
+            if (host.SlotsMap.has(ID)) {
+                Host = host;
+                break;
+            }
+        }
+        return Host;
+    }
+
+    private static async waitWriteSlotTakeRespond(Slot:TSlot, tag: string, FieldBus:TFieldBus): Promise<any | IErrorMessage> {
         return new Promise((resolve, reject)=>{
-            Slot.onFulfilled = async function () {
-                console.log(Slot);
-                //найти к какому Хосту относится Слот
-                var Host: THost = undefined;
-                for (const host of Tagger.Hosts.HostsMap.values()) {
-                    if (host.SlotsMap.has(Slot.slotSet.ID)) {
-                        Host = host;
-                        break;
-                    }
-                }
-                var result: any;
-                if (Host !== undefined) {
-                    result = await Host.deleteSlotFromHost(Slot.slotSet.ID)
-                    console.log('onFulfilled:',result)
-                    Host.deleteSlotFromMap(Slot.slotSet.ID)
-                    
-                }
-                const {status, time, ID} = result;
-                if (status === "OK") {
-                    resolve({
+
+            Slot.onFulfilled = function () {
+                console.log('Has taken Respond onFulfilled:',Slot);
+                FieldBus.checkHeaderOfAnswer(Slot);
+                resolve({
                     tag,
                     msg:`Tag ${tag} has been written`
+                })
+            }
+
+            Slot.onRejected = function () {
+                console.log('Has taken Respond onRejected:',Slot);
+                resolve ({
+                    status: 'Error',
+                    msg:`Tag ${tag} hasn't been written`
+                })
+            }
+        })
+    }
+
+    private static async deleteWritingSlot(Slot:TSlot, tag: string): Promise<any | IErrorMessage> {
+        return new Promise((resolve, reject)=>{
+
+            const ID: string = Slot.slotSet.ID;
+            Slot.onFulfilled = async function () {
+                console.log('Wait Until Slot Deleted. onFulfilled:',Slot);
+                //найти к какому Хосту относится Слот
+                var Host: THost = Tagger.getHostBySlotID(ID)
+                var result: any;
+                if (Host !== undefined) {
+                    result = await Host.deleteSlotFromHost(ID)
+                    console.log('onFulfilled:',result)
+                    Host.deleteSlotFromMap(ID)
+                }
+                const {status} = result;
+                if (status === "OK") {
+                    resolve({
+                    msg:`Slot ${ID} has been deleted`
                 })} else {
                     reject ({
-                        msg: `Tag ${tag} hasn't been written`
+                        msg: `Slot ${ID} hasn't been deleted`
                     })
                 }
             }
@@ -78,7 +106,7 @@ export default class Tagger {
             Slot.onRejected = function () {
                 console.log('onRejected:',Slot);
                 reject ({
-                    msg: `Tag ${tag} hasn't been written`
+                    msg: `SLot ${ID} hasn't been deleted`
                 })
             }
         })
@@ -107,8 +135,10 @@ export default class Tagger {
             const Host:THost = Tagger.Hosts.getHostByName(host);
             const Slot:TSlot = Host.addSlotSetToMap(SlotSet);
             await Host.setSlotToHost(Slot);
-            const result = await Tagger.waitValueHasWritten(Slot, tag)
-            return (result)
+            const respond = await Tagger.waitWriteSlotTakeRespond(Slot, tag, FieldBus);
+            const result = await Tagger.deleteWritingSlot(Slot, tag)
+            console.log(result)
+            return (respond)
         } catch (e) {
             throw new Error(e.message)
         }
