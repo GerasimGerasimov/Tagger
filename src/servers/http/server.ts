@@ -33,8 +33,10 @@ export default class HttpServer{
 
         app.route('/v1/devices/')
             .put   (jsonParser, [this.getDeviceTagsAPI.bind(this)])
-            .patch (jsonParser, [this.setDeviceParametersAPI.bind(this)]);
- 
+        
+        app.route('/v1/values/')
+            .put (jsonParser, [this.setDeviceParametersAPI.bind(this)]);
+        
         app.route('/v1/info/')
             .get   (jsonParser, [this.getDevicesInfoAPI.bind(this)])
 

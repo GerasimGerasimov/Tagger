@@ -60,7 +60,6 @@ export default class Tagger {
         return new Promise((resolve, reject)=>{
 
             Slot.onFulfilled = function () {
-                console.log('Has taken Respond onFulfilled:',Slot);
                 FieldBus.checkHeaderOfAnswer(Slot);
                 resolve({
                     tag,
@@ -69,7 +68,6 @@ export default class Tagger {
             }
 
             Slot.onRejected = function () {
-                console.log('Has taken Respond onRejected:',Slot);
                 resolve ({
                     status: 'Error',
                     msg:`Tag ${tag} hasn't been written`
@@ -83,13 +81,11 @@ export default class Tagger {
 
             const ID: string = Slot.slotSet.ID;
             Slot.onFulfilled = async function () {
-                console.log('Wait Until Slot Deleted. onFulfilled:',Slot);
                 //найти к какому Хосту относится Слот
                 var Host: THost = Tagger.getHostBySlotID(ID)
                 var result: any;
                 if (Host !== undefined) {
                     result = await Host.deleteSlotFromHost(ID)
-                    console.log('onFulfilled:',result)
                     Host.deleteSlotFromMap(ID)
                 }
                 const {status} = result;
@@ -104,7 +100,6 @@ export default class Tagger {
             }
 
             Slot.onRejected = function () {
-                console.log('onRejected:',Slot);
                 reject ({
                     msg: `SLot ${ID} hasn't been deleted`
                 })
