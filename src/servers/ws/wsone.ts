@@ -56,17 +56,30 @@ export class Socket {
         (commands[key] || commands['default'])(msg)
     }
 
+    /** Пример get - запроса
+    {
+        "cmd": "get",
+        "ClientID": "oKHFgg", - клиент должен подставить свой ID в запрос
+                                и думать о реконнекте если потеряет связь
+        "payload": {
+           "U1":{
+             "RAM":"ALL"
+            }
+        }
+    } 
+     */
     private getData(msg: TMessage) {
+        const nowDate = new Date().getTime();
         var payload: any = {}
         if (this.onGetData) {
             payload = this.onGetData(msg.payload);
         }
         const respond: TRespond  = {
-            MessageID: msg.MessageID,
+            MessageID: msg.MessageID || nowDate.toString(),
             cmd: 'get',
             payload
         };
-        console.log(`send: ${this.ID} msg: ${msg.MessageID} time ${new Date().getTime()}`)
+        console.log(`send: ${this.ID} msg: ${msg.MessageID} time ${nowDate}`)
         this.send(respond);
     }  
 
