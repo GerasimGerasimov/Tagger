@@ -23,7 +23,6 @@ export default class WSServer {
     }
 
     private connectionOnWss( ws: WebSocket) {
-        console.log('Connection');
         let arg: TSocketParameters = {
             ws,
             onCloseAction: this.closeSocket.bind(this),
@@ -31,20 +30,22 @@ export default class WSServer {
         }
         let socket: Socket = new Socket(arg);
         this.sockets.add(socket);
+        console.log(`Connection: ${socket.ID}`);
         //отправляю сообщение с идентификатором подключения
         socket.send({cmd:'id',
                      payload: socket.ID})
     }
 
     private closeSocket(ID: string){
-        console.log(ID);
+      console.log(ID);
         try {
-            this.sockets.forEach((socket: Socket) => {
-                if (socket.ID === ID) {
-                    this.sockets.delete(socket);
-                    throw new Error(`Connection ${ID} has closed`)
-                }
-            })
+          for ( let socket of this.sockets) {
+            if (socket.ID === ID) {
+              this.sockets.delete(socket);
+              console.log(`Connection ${ID} has closed`);
+              break;
+            }
+          }
         } catch (e) {
             console.log(e);
         } 
