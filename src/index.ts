@@ -21,5 +21,5 @@ const HostAPIs: IHostAPI  = {
   }
 
 const Server: HttpServer = new HttpServer(5004, HostAPIs);
-const WSS: WSServer = new WSServer(Server.https, Tagger.getDeviceData);
+const WSS: WSServer = new WSServer(Server.https, HostAPIs);
 console.log('Tagger Service started');

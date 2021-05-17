@@ -7,7 +7,7 @@ import {randomStringAsBase64Url} from '../../utils/cryputils'
 export class TSocketParameters {
     ws: WebSocket;
     onCloseAction: Function;
-    onGetData: Function;
+    onReceivedData: Function;
 }
 
 export class Socket {
@@ -15,13 +15,13 @@ export class Socket {
     public  commands: Set<TTask>;
     public ID: string = '';
     private onCloseAction: Function;
-    private onGetData: Function;
+    private onReceivedData: Function;
 
     constructor (arg: TSocketParameters){
         this.ws = arg.ws;
         this.ID = randomStringAsBase64Url(4);
         this.onCloseAction = arg.onCloseAction;
-        this.onGetData = arg.onGetData;
+        this.onReceivedData = arg.onReceivedData;
         this.ws.on('message', this.onMessage.bind(this));
         this.ws.on('close', this.onClose.bind(this))
     }
@@ -34,7 +34,7 @@ export class Socket {
     private async onMessage(message: any) {
         try {
             const request = validationJSON(message);
-            this.decodeCommand(request);
+            this.processReceivedData(request);
         } catch (e) {
             this.send(ErrorMessage(e.message || ''));
         }
@@ -43,17 +43,6 @@ export class Socket {
     private onClose(){
         console.log('Connection close');
         this.onCloseAction(this.ID);
-    }
-
-    private decodeCommand(msg: TMessage){
-        const key = msg.cmd;
-        const commands = {
-            'get'    : this.getData.bind(this),
-            'default': () => {
-                return ErrorMessage('Unknown command');
-            }
-        };
-        (commands[key] || commands['default'])(msg)
     }
 
     /** Пример get - запроса
@@ -68,18 +57,20 @@ export class Socket {
         }
     } 
      */
-    private getData(msg: TMessage) {
+
+    private processReceivedData(msg: TMessage) {
         const nowDate = new Date().getTime();
         var payload: any = {}
-        if (this.onGetData) {
-            payload = this.onGetData(msg.payload);
+        if (this.onReceivedData) {
+            payload = this.onReceivedData(msg);
         }
         const respond: TRespond  = {
+            ClientID: this.ID,
             MessageID: msg.MessageID || nowDate.toString(),
-            cmd: 'get',
+            cmd: msg.cmd,
             payload
         };
-        console.log(`send: ${this.ID} msg: ${msg.MessageID} time ${nowDate}`)
+        console.log(`send: ${this.ID} msg: ${respond.MessageID} time ${nowDate}`)
         this.send(respond);
     }  
 

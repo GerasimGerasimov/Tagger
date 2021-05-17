@@ -1,4 +1,7 @@
+import { ErrorMessage } from '../../utils/errors';
 import WebSocket = require('ws');
+import { HostAPIFunc, IHostAPI } from '../hostapi';
+import { TMessage } from './types';
 interface getDeviceDataFunc {({}): any;}
 import {Socket, TSocketParameters} from './wsone';
 
@@ -6,13 +9,16 @@ export default class WSServer {
     private https: any;
     private wss: any;
     private sockets: Set<Socket>;
-    private count: number = 0;
 
-    private proc: getDeviceDataFunc  = undefined;
+    private getDeviceData: HostAPIFunc  = undefined;
+    private getDevicesInfo: HostAPIFunc  = undefined;
+    private writeDeviceParameter: HostAPIFunc  = undefined;
 
-    constructor (https: any, proc: getDeviceDataFunc) {
+    constructor (https: any,  HostAPIs: IHostAPI) {
         this.https = https;
-        this.proc = proc;
+        this.getDeviceData  = HostAPIs.getDeviceData;
+        this.getDevicesInfo = HostAPIs.getDevicesInfo;
+        this.writeDeviceParameter = HostAPIs.writeDeviceParameter;
         this.sockets = new Set<Socket>();
         this.init();
     }
@@ -26,8 +32,14 @@ export default class WSServer {
         let arg: TSocketParameters = {
             ws,
             onCloseAction: this.closeSocket.bind(this),
-            onGetData: this.getData.bind(this)
+            onReceivedData: this.decodeCommand.bind(this)
         }
+        //передать в новый сокет серверную функцию, которую сокет будет
+        //вызывать при получении данных.
+        //Получил данные - вызвал серверную функцию
+        //Она разбирает полученный пакет, готовит ответ (payload)
+        //и возвращает управление сокету, который уже отправляет данные
+        //снабжая дополнительной информацеий (своим ID)
         let socket: Socket = new Socket(arg);
         this.sockets.add(socket);
         console.log(`Connection: ${socket.ID}`);
@@ -51,9 +63,27 @@ export default class WSServer {
         } 
     }
 
-    private getData(request: any): any {
-        const payload = this.proc(request);
-        return payload;
+    private decodeCommand(msg: TMessage): any {
+      const key = msg.cmd;
+      const commands = {
+          'getInfo'      : this.getInfo.bind(this),
+          'getValues'    : this.getValues.bind(this),
+          'default': () => {
+              return ErrorMessage('Unknown command');
+          }
+      };
+      return (commands[key] || commands['default'])(msg)
+  }
+
+    private getInfo(request: any): any {
+      const payload = this.getDevicesInfo(request);
+      return payload;
+    }
+
+
+    private getValues(request: any): any {
+      const payload = this.getDeviceData(request.payload);
+      return payload;
     }
 
 }
