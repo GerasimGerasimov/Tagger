@@ -54,12 +54,12 @@ export default class WSControl {
 
     private async waitForConnect(): Promise<string> {
         return new Promise(async (resolve, reject) => {
-            if (this.hostState) return resolve();
+            if (this.hostState) return resolve('socket has connected');
             console.log('waitForConnect');
             const Timer = setInterval( ()=>{
                 if (this.hostState) { 
                     clearInterval(Timer);
-                    return resolve();
+                    return resolve('socket has connected');
                 }
             }, 100);
         })
