@@ -1,4 +1,5 @@
 import http = require('http');
+import cors = require('cors');
 import express = require("express");
 import bodyParser = require('body-parser');
 import { IHostAPI, HostAPIFunc } from '../hostapi';
@@ -23,13 +24,7 @@ export default class HttpServer{
 }
 
     private init () {
-        app.all('*', function(req, res, next) {
-            res.header("Access-Control-Allow-Origin", "*");
-            res.header("Access-Control-Allow-Headers", "X-Requested-With");
-            res.header('Access-Control-Allow-Headers', 'Content-Type');
-            res.setHeader('Access-Control-Allow-Headers', 'origin, content-type, accept');
-            next();
-        });
+        app.use(cors({ origin: true }));
 
         app.route('/v1/devices/')
             .put   (jsonParser, [this.getDeviceTagsAPI.bind(this)])
