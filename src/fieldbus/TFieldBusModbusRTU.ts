@@ -69,6 +69,7 @@ export class TFieldBusModbusRTU extends TFieldBus {
                 result.interval = Source.interval;
                 result.NotRespond = Source.NotRespond;
                 result.TimeOut = Source.TimeOut.read;
+                result.ChunksEndTime = Source.ChunksEndTime || 10;
                 result.ID = `${PositionName}:${Source.section}`;
                 result.RegsRange = range;
                 result.commandType = TCommadType.ReadMultiplayRegisters;
