@@ -1,6 +1,6 @@
 import fs = require('fs');
 import path = require('path');
-import { ConfigPath } from './configpath';
+import { ConfigPath } from './config';
 
 export const ConfDirName: string = path.resolve(ConfigPath,'');//path.resolve(__dirname,'../.././configuration/');
 

@@ -1,4 +1,4 @@
-import { ConfigPath } from './utils/configpath';
+import { ConfigPath, ServicePort } from './utils/config';
 import {THosts} from './client/THosts';
 import {TDevices} from './devices/TDevices';
 import TTagsSource from './devices/TTagsSource';
@@ -23,6 +23,6 @@ const HostAPIs: IHostAPI  = {
     writeDeviceParameter: Tagger.writeDeviceParameter
   }
 
-const Server: HttpServer = new HttpServer(5004, HostAPIs);
+const Server: HttpServer = new HttpServer(Number(ServicePort), HostAPIs);
 const WSS: WSServer = new WSServer(Server.https, HostAPIs);
 console.log('Tagger Service started');
