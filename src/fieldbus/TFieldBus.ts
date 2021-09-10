@@ -14,7 +14,8 @@ export class TSlotSource {
     TimeOut: TTimeOut  = {
         read: 100,
         write: 100
-    }
+    };
+    ChunksEndTime: number;
 }
 
 export abstract class TFieldBus {

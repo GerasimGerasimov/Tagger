@@ -27,6 +27,7 @@ export class TSlotSet {
     TimeOut: number = 100;//время ожидания ответа устройства
     RegsRange:TRegsRange = undefined;
     commandType: TCommadType;
+    ChunksEndTime?: number = 10;
 }
 
 export const enum TCommadType {

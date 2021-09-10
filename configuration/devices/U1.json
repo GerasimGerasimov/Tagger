@@ -11,7 +11,8 @@
                 "write": 100
             },
             "NotRespond": false,
-            "interval":0
+            "interval":0,
+            "ChunksEndTime":5
         },
         "U1:CD": {
             "section":"CD",
@@ -21,7 +22,8 @@
                 "write": 1000
             },
             "NotRespond": false,
-            "interval":1000
+            "interval":1000,
+            "ChunksEndTime":5
         },
         "U1:FLASH": {
             "section":"FLASH",
@@ -31,7 +33,8 @@
                 "write": 500
             },
             "NotRespond": false,
-            "interval":1000
+            "interval":1000,
+            "ChunksEndTime":5
         }
     }
 }

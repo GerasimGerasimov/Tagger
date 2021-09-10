@@ -11,7 +11,8 @@
                 "write": 500
             },
             "NotRespond": false,
-            "interval":1000
+            "interval":1000,
+            "ChunksEndTime":5
         }
     }
 }
