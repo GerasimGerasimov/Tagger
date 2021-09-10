@@ -1,3 +1,4 @@
+import { ConfigPath } from './utils/configpath';
 import {THosts} from './client/THosts';
 import {TDevices} from './devices/TDevices';
 import TTagsSource from './devices/TTagsSource';
@@ -6,6 +7,8 @@ import Tagger from './Tagger/Tagger';
 import HttpServer from "./servers/http/server";
 import WSServer from "./servers/ws/server";
 import { IHostAPI } from './servers/hostapi';
+
+console.log(ConfigPath);
 
 const Hosts: THosts = new THosts();
 const TagsSource: TTagsSource = new TTagsSource();
