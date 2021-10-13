@@ -14,9 +14,15 @@ export class THost {
 
     constructor (host: string) {
         this.URL = host;
-        this.host = new HostController({host, handler: this.decodeCommand.bind(this)});
+        this.host = new HostController({host,
+                                        onIncomingMessageHandler: this.decodeCommand.bind(this),
+                                        onOpenConnectionHandler: this.sendSlotSetsToHost.bind(this)}
+                                    );
     }
 
+    private async sendSlotSetsToHost() {
+        await this.setSlotSetsToHost();
+    }
     //сервер передаёт подтверждения о выполненных командах
     //и "закидывает" данные по мере их появления
     private decodeCommand(msg: any): any | IErrorMessage {

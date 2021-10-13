@@ -2,14 +2,22 @@ import WSControl from './wscontroller'
 import {IServiceRespond, validationJSON} from '../../utils/types'
 import {IErrorMessage, ErrorMessage}  from '../../utils/errors'
 
+interface handler {({}): any;}
+
 export default class HostController {
 
     private  wss: WSControl;
-    private onIncomingMessage: Function = undefined;
+    private onIncomingMessage: handler = undefined;
+    private onOpenConnection: handler = undefined;
     
-    constructor ({ host, handler }: { host: string; handler: Function; }){
-        this.wss = new WSControl({ host, handler: this.checkIncomingMessage.bind(this) });
-        this.onIncomingMessage = handler;
+    constructor ({ host, onIncomingMessageHandler, onOpenConnectionHandler }:
+                   { host: string;
+                     onIncomingMessageHandler: handler;
+                     onOpenConnectionHandler: handler}){
+        this.wss = new WSControl({ host,
+                                   onIncomingMessageHandler: this.checkIncomingMessage.bind(this),
+                                   onOpenConnectionHandler});
+        this.onIncomingMessage = onIncomingMessageHandler;
     }
      
     public checkIncomingMessage(msg: any) {

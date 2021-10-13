@@ -8,10 +8,15 @@ export default class WSControl {
     private ws:WebSocket;
     private hostState: boolean = false;
     private onIncomingMessage: handler;
+    private onOpenConnection: handler;
 
-    constructor ({ host, handler }: { host: string; handler: handler; }){
+    constructor ({ host,  onIncomingMessageHandler,  onOpenConnectionHandler }: { host: string; 
+                                        onIncomingMessageHandler: handler;
+                                        onOpenConnectionHandler: handler;
+                                    }){
         this.host = host;
-        this.onIncomingMessage = handler;
+        this.onIncomingMessage =  onIncomingMessageHandler;
+        this.onOpenConnection  =  onOpenConnectionHandler;
         this.initSocket();
     }
 
@@ -32,6 +37,9 @@ export default class WSControl {
 
     private onOpen(event: any) {
         console.log(`Opened connection to ${this.host}`);
+        if (this.onOpenConnection) {
+            this.onOpenConnection('');
+        }
         this.hostState = true;
     }    
 

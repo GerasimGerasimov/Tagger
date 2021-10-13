@@ -7,7 +7,6 @@ import {TFieldBusModbusRTU} from '../fieldbus/TFieldBusModbusRTU';
 
 export function initSlotSets(Hosts: THosts, Devices: TDevices) {
     createSlotSets(Hosts, Devices);
-    sendSlotSetsToHosts(Hosts);
 }
 
 function createSlotSets(hosts: THosts, devices: TDevices) {
@@ -29,9 +28,4 @@ function createSlotSets(hosts: THosts, devices: TDevices) {
             }
         });
     });
-}
-
-//передам СлотСеты реальным хостам используя API /v1/slots/put
-async function sendSlotSetsToHosts(Hosts: THosts) {
-    await Hosts.sendSlotSetsToHosts();
 }
