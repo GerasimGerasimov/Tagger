@@ -34,7 +34,7 @@ export class Socket {
     private async onMessage(message: any) {
         try {
             const request = validationJSON(message);
-            this.processReceivedData(request);
+            await this.processReceivedData(request);
         } catch (e) {
             this.send(ErrorMessage(e.message || ''));
         }
@@ -58,11 +58,11 @@ export class Socket {
     } 
      */
 
-    private processReceivedData(msg: TMessage) {
+    private async processReceivedData(msg: TMessage) {
         const nowDate = new Date().getTime();
         var payload: any = {}
         if (this.onReceivedData) {
-            payload = this.onReceivedData(msg);
+            payload = await this.onReceivedData(msg);
         }
         const respond: TRespond  = {
             ClientID: this.ID,
@@ -70,7 +70,7 @@ export class Socket {
             cmd: msg.cmd,
             payload
         };
-        console.log(`send: ${this.ID} msg: ${respond.MessageID} time ${nowDate}`)
+        console.log(`send to: ${this.ID} cmd:${msg.cmd} msgID: ${respond.MessageID}`)
         this.send(respond);
     }  
 

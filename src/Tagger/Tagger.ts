@@ -15,24 +15,82 @@ export default class Tagger {
         Tagger.Devices = Devices; 
     }
 
+    /*WS
+    {
+        "cmd": "getInfo",
+        "ClientID": "IGoG4Q"
+    }
+    */
+    public static getDevicesInfo(request: Object): any {
+        return Tagger.Devices.getDevicesInfo();
+    }
+
+    /*WS
+    {
+        "cmd": "getValues",
+        "ClientID": "zeD4vg",
+        "payload": {
+                   "U1":{
+                   "RAM":["Uexc","Ustat","PWR"]
+                  }
+        }
+      }
+    */
     public static getDeviceData(request: Object): any {
         try {
             const SlotsDataRequest :TSlotsDataRequest  = Tagger.Devices.getSlotsDataRequest(request);
             const host:THost = Tagger.Hosts.getHostByName(SlotsDataRequest.Host);
             const result: any = Tagger.fillRespond(SlotsDataRequest, host);
-            return {
-                status:'OK',
-                time: new Date().toISOString(),
-                data: result }
+            return result;
         } catch (e) {
             return ErrorMessage(e.message)
         }
     }
-  
-    public static getDevicesInfo(request: Object): any {
-        return Tagger.Devices.getDevicesInfo();
-    }
 
+    /*WS
+    {
+        "cmd": "setValue",
+        "ClientID": "zeD4vg",
+        "payload": {
+                    "U1":{
+                        "RAM":{
+                            "PWR": 0
+                        }
+                    }
+        }
+    }
+    */
+    public static async writeDeviceParameter(request: Object): Promise <string | Error> {
+        try {
+            //1) выделить что и куда передавать
+            const device:  TSlotsDataRequest = Tagger.Devices.getSlotsDataRequest(request);
+            const {host, FieldBus, FieldBusAddr, PositionName} = device.AddressableDevice;
+            const {SectionName, Request} = device.SlotDataRequest[0];
+            device.AddressableDevice.isSection(SectionName);
+            //из Request достать параметр который надо поменять.
+            //Это объект отбъектов, но интересует только один параметров
+            //так как сейчас я обрабатываю ввод клавиатуры, а это один изменённый параметр
+            //TODO потом подумаю как обрабатывать несколько параметров, 
+            //     самый тупой подход - это одна команда записи на один параметр
+            const {key: tag, value} = Tagger.getKeyAndValueOnce(Request);
+            const values: Map<string, any> = new Map();
+            values.set(tag, value);
+            device.AddressableDevice.isTag(SectionName, tag);
+            //2) Создать запрос для размещения в слот
+            const SlotSourceKey: string = `${PositionName}:${SectionName}`;
+            const SlotSource: TSlotSource = device.AddressableDevice.SlotsDescription[SlotSourceKey];
+            const SlotSet:TSlotSet = FieldBus.createWriteSlot(PositionName, SlotSource, values);
+            const Host:THost = Tagger.Hosts.getHostByName(host);
+            const Slot:TSlot = Host.addSlotSetToMap(SlotSet);
+            await Host.setSlotToHost(Slot);
+            const respond = await Tagger.waitWriteSlotTakeRespond(Slot, tag, FieldBus);
+            const result = await Tagger.deleteWritingSlot(Slot, tag)
+            console.log(result);
+            return `${tag} has been changed to ${value}`;
+        } catch (e) {
+            throw new Error(e.message)
+        }
+    }    
     /*Записать новые значения выбранным параметрам
     1) Передаю объект с указанием:
         {
@@ -105,38 +163,6 @@ export default class Tagger {
                 })
             }
         })
-    }
-
-    public static async writeDeviceParameter(request: Object): Promise <any | Error> {
-        try {
-            //1) выделить что и куда передавать
-            const device:  TSlotsDataRequest = Tagger.Devices.getSlotsDataRequest(request);
-            const {host, FieldBus, FieldBusAddr, PositionName} = device.AddressableDevice;
-            const {SectionName, Request} = device.SlotDataRequest[0];
-            device.AddressableDevice.isSection(SectionName);
-            //из Request достать параметр который надо поменять.
-            //Это объект отбъектов, но интересует только один параметров
-            //так как сейчас я обрабатываю ввод клавиатуры, а это один изменённый параметр
-            //TODO потом подумаю как обрабатывать несколько параметров, 
-            //     самый тупой подход - это одна команда записи на один параметр
-            const {key: tag, value} = Tagger.getKeyAndValueOnce(Request);
-            const values: Map<string, any> = new Map();
-            values.set(tag, value);
-            device.AddressableDevice.isTag(SectionName, tag);
-            //2) Создать запрос для размещения в слот
-            const SlotSourceKey: string = `${PositionName}:${SectionName}`;
-            const SlotSource: TSlotSource = device.AddressableDevice.SlotsDescription[SlotSourceKey];
-            const SlotSet:TSlotSet = FieldBus.createWriteSlot(PositionName, SlotSource, values);
-            const Host:THost = Tagger.Hosts.getHostByName(host);
-            const Slot:TSlot = Host.addSlotSetToMap(SlotSet);
-            await Host.setSlotToHost(Slot);
-            const respond = await Tagger.waitWriteSlotTakeRespond(Slot, tag, FieldBus);
-            const result = await Tagger.deleteWritingSlot(Slot, tag)
-            console.log(result)
-            return (respond)
-        } catch (e) {
-            throw new Error(e.message)
-        }
     }
 
     private static getKeyAndValueOnce(req: any): {key: string; value: any;} {

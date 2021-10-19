@@ -63,27 +63,46 @@ export default class WSServer {
         } 
     }
 
-    private decodeCommand(msg: TMessage): any {
+    private isAutorizedClient(ID: string): never | any {
+      for ( let socket of this.sockets) {
+        if (socket.ID === ID) return;
+      }
+      throw new Error(`Client ${ID} isn't autorized`);
+    }
+
+    private async decodeCommand(msg: TMessage): Promise<any> {
+      this.isAutorizedClient(msg.ClientID);
       const key = msg.cmd;
       const commands = {
           'getInfo'      : this.getInfo.bind(this),
           'getValues'    : this.getValues.bind(this),
+          'setValue'    : this.setValue.bind(this),
           'default': () => {
               return ErrorMessage('Unknown command');
           }
       };
-      return (commands[key] || commands['default'])(msg)
+      return await (commands[key] || commands['default'])(msg)
   }
 
     private getInfo(request: any): any {
-      const payload = this.getDevicesInfo(request);
-      return payload;
+      const data = this.getDevicesInfo(request);
+      return {status:'OK',
+              time: new Date().toISOString(),
+              data};
     }
-
 
     private getValues(request: any): any {
-      const payload = this.getDeviceData(request.payload);
-      return payload;
+      const data = this.getDeviceData(request.payload);
+      return {status:'OK',
+              time: new Date().toISOString(),
+              data
+            };
     }
 
+    private async setValue(request: any): Promise<any> {
+      const data = await this.writeDeviceParameter(request.payload);
+      return {status:'OK',
+              time: new Date().toISOString(),
+              data }
+    }
 }
